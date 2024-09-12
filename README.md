@@ -6,6 +6,7 @@ Descripción de Red Seguro
 - GIT (https://git-scm.com/downloads)
 - python 3.12.5 (https://www.python.org/downloads)
 - django 5.1.1 (https://www.djangoproject.com/download)
+- node.js LTS 18.20.4 (https://nodejs.org/en/download/prebuilt-installer)
 
 ## Instalación
 ```bash
@@ -26,6 +27,8 @@ python.exe -m pip install --upgrade pip
 pip install django-admin
 
 pip install -r requirements.txt
+
+npm install
 ```
 
 ## Iniciar proyecto
