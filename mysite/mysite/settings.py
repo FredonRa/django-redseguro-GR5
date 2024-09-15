@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'compressor',
     'usuarios',
     'conversaciones',
+    'gestiones',
+    'pasos',
 ]
 
 MIDDLEWARE = [
