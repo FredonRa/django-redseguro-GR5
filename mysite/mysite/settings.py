@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'conversaciones',
     'gestiones',
     'pasos',
-    'opciones'
+    'opciones',
+    'respuestas'
 ]
 
 MIDDLEWARE = [
