@@ -5,7 +5,7 @@ class Usuario(models.Model):
     usuario_id = models.AutoField(primary_key=True)
     nombre = models.CharField(null=False, max_length=50)
     apellido = models.CharField(null=False, max_length=50)
-    mail = models.EmailField(null=False, unique=True)
+    email = models.EmailField(null=False, unique=True)
     contrasenia = models.CharField(null=False, max_length=10, default="12345")
 
     

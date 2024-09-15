@@ -48,3 +48,10 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# modulos instalados del package.json
+node_modules
+package-lock.json
+
+#Cache de tailwind
+*CACHE

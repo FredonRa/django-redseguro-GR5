@@ -12,6 +12,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.nombre = validated_data.get('nombre', instance.nombre)
         instance.apellido = validated_data.get('apellido', instance.apellido)
-        instance.mail = validated_data.get('mail', instance.mail)
+        instance.email = validated_data.get('mail', instance.mail)
         instance.save()
         return instance
