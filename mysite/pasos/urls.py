@@ -1,10 +1,10 @@
-from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import PasosViewSetViewSet
+
+router = DefaultRouter()
+router.register(r'pasos', PasosViewSetViewSet , basename='pasos')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('usuarios.urls')),
-    path('api/', include('conversaciones.urls')),
-    path('api/', include('gestiones.urls')),
-    path('api/', include('pasos.urls')),
+    path('', include(router.urls)),
 ]
