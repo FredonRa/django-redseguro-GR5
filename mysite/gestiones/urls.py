@@ -1,10 +1,11 @@
-from django.contrib import admin
+# usuario/urls.py
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import GestionViewSet
+
+router = DefaultRouter()
+router.register(r'gestiones', GestionViewSet, basename='gestiones')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('usuarios.urls')),
-    path('api/', include('conversaciones.urls')),
-    path('api/', include('gestiones.urls')),
-   
+    path('', include(router.urls)),
 ]

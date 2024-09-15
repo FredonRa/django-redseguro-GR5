@@ -3,9 +3,9 @@ from django.shortcuts import render
 # Create your views here.
 
 from rest_framework import viewsets
-from .models import Pasos
-from .serializers import PasosSerializer
+from .models import Paso
+from .serializers import PasoSerializer
 
-class PasosViewSet(viewsets.ModelViewSet):
-    queryset = Pasos.objects.all()
-    serializer_class = PasosSerializer
+class PasoViewSet(viewsets.ModelViewSet):
+    queryset = Paso.objects.all()
+    serializer_class = PasoSerializer
