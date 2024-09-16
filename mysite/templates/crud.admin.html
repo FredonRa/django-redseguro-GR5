@@ -1,0 +1,36 @@
+{% extends "_base.admin.html" %}
+{% load static %}
+
+{% block javascript %}
+<script src="{% static 'src/js/services/CrudService.js' %}"></script>
+<script src="{% static 'src/js/crud.admin.js' %}"></script>
+{% endblock javascript %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+  <h1 id="crud-title" class="text-3xl font-bold mb-4"></h1>
+
+  <!-- Formulario para crear/editar entidad -->
+  <div id="crud-form" class="mb-8">
+    <form id="entityForm" class="bg-white p-6 rounded-lg shadow-lg">
+      <!-- Campos dinámicos -->
+      <div id="form-fields"></div>
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+        Guardar
+      </button>
+    </form>
+  </div>
+
+  <!-- Tabla de entidades -->
+  <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+    <thead class="bg-gray-200">
+      <tr id="table-headers">
+        <!-- Encabezados dinámicos -->
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      <!-- Contenido dinámico -->
+    </tbody>
+  </table>
+</div>
+{% endblock content %}
