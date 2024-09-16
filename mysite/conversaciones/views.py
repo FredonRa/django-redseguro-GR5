@@ -1,14 +1,13 @@
 # conversaciones/views.py
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.exceptions import NotFound
 from .models import Conversacion
 from .serializers import ConversacionSerializer
 from django.apps import apps
 from django.http import JsonResponse
 from django.db import models
+from django.db.models import ForeignKey
 
 class ConversacionViewSet(viewsets.ModelViewSet):
     queryset = Conversacion.objects.all()
@@ -23,34 +22,41 @@ class ConversacionViewSet(viewsets.ModelViewSet):
     
 class ModelFieldsView(APIView):
     def get(self, request, *args, **kwargs):
-        # Obtener el modelo Conversacion
-        try:
-            model = apps.get_model('conversaciones', 'Conversacion')
-            print("model: ", model)
-        except LookupError:
-            raise NotFound("Modelo 'Conversacion' no encontrado.")
-        
-        # Obtener los campos del modelo
-        fields = [field.name for field in model._meta.get_fields()]
-        
-        return Response({'fields': fields}, status=status.HTTP_200_OK)
-    
-def get_model_field_types(request):
     # Obtén el modelo dinámicamente
-    model = apps.get_model('conversaciones', "Conversacion")
-    fields = model._meta.get_fields()
+        model = apps.get_model('conversaciones', "Conversacion")
+        fields = model._meta.get_fields()
+        
+        # Formatea los tipos de campo
+        field_types = []
+        for field in fields:
+            field_info = {
+                'name': field.name,
+                'type': 'datetime-local' if isinstance(field, models.DateTimeField) else 
+                        'select' if isinstance(field, models.ForeignKey) else 
+                        'number' if isinstance(field, models.IntegerField) else 
+                        'text' if isinstance(field, models.CharField) else 
+                        '',
+               'editable': field.editable and not field.primary_key 
+            }
+            
+            # Si el campo es ForeignKey, obtengo las claves del modelo relacionado
+            if isinstance(field, ForeignKey):
+                related_model = field.related_model
+                related_fields = related_model._meta.get_fields()
+                # Filtra los nombres de los campos de interés
+                field_names = ['usuario_id', 'nombre', 'apellido']
+                related_field_names = [related_field.name for related_field in related_fields if related_field.name in field_names]
+                field_info['options'] = related_field_names
+            
+            field_types.append(field_info)
+        
+        return JsonResponse(field_types, safe=False)
     
-    # Formatea los tipos de campo
-    field_types = []
-    for field in fields:
-        field_info = {
-            'name': field.name,
-            'type': 'datetime' if isinstance(field, models.DateTimeField) else 
-                    'integer' if isinstance(field, models.IntegerField) else 
-                    'char' if isinstance(field, models.CharField) else 
-                    'integer' if isinstance(field, models.ForeignKey) else 
-                    'other'
+class ModelActionsView(APIView):
+    def get(self, request, *args, **kwargs):
+        acciones = {
+            'crear': True,  # O False según la lógica de negocio
+            'editar': True,    # O False según la lógica de negocio
+            'eliminar': True   # O False según la lógica de negocio
         }
-        field_types.append(field_info)
-    
-    return JsonResponse(field_types, safe=False)
+        return JsonResponse(acciones, safe=False)

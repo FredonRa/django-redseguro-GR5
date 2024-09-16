@@ -1,5 +1,5 @@
 <nav id="sidebar"
-    class="fixed z-20 top-0 left-0 w-64 h-full bg-gray-800 text-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out">
+    class="container fixed z-20 top-0 left-0 w-64 h-full bg-slate-800 text-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out">
     <div class="p-4">
         <h2 class="text-xl font-bold">Menú</h2>
         <ul class="mt-4">
@@ -9,9 +9,17 @@
         </ul>
     </div>
 </nav>
-<div class="bg-gray-900 z-0 text-white p-4 flex items-center">
-    <button id="menu-button" class="p-2 bg-blue-500 text-white rounded-md">☰ Menú</button>
-    <h1 class="text-2xl font-bold ml-4">Contenido Principal</h1>
+<div class="bg-slate-800 z-0 text-white p-2 flex items-center">
+    <button id="menu-button" class="p-2 text-white rounded-md">
+        <svg height="24px" id="Layer_1" style="enable-background:new 0 0 32 32;" version="1.1" viewBox="0 0 32 32"
+            width="24px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <path fill="#ffffff"
+                d="M4,10h24c1.104,0,2-0.896,2-2s-0.896-2-2-2H4C2.896,6,2,6.896,2,8S2.896,10,4,10z M28,14H4c-1.104,0-2,0.896-2,2  s0.896,2,2,2h24c1.104,0,2-0.896,2-2S29.104,14,28,14z M28,22H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h24c1.104,0,2-0.896,2-2  S29.104,22,28,22z" />
+        </svg>
+
+    </button>
+    <h1 class="text-2xl font-bold ml-4">Backoffice</h1>
 </div>
 <div id="overlay"
     class="hidden fixed z-10 inset-0 bg-black pointer-events-auto opacity-50 transition-opacity duration-300">

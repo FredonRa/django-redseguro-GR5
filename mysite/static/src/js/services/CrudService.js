@@ -9,8 +9,16 @@ class _CrudService {
         return await this.client.get('');
     }
 
+    async getById(entityId) {
+        return await this.client.get(`${entityId}/`);
+    }
+
     async getFields() {
-        return await this.client.get('fields/');
+        return await this.client.get('campos/');
+    }
+
+    async getActions() {
+        return await this.client.get('acciones/');
     }
 
     // Crear un nuevo entidad

@@ -3,23 +3,13 @@
 
 {% block javascript %}
 <script src="{% static 'src/js/services/CrudService.js' %}"></script>
+<script src="{% static 'src/js/moment.js' %}"></script>
 <script src="{% static 'src/js/crud.admin.js' %}"></script>
 {% endblock javascript %}
 
 {% block content %}
 <div class="container mx-auto py-8">
   <h1 id="crud-title" class="text-3xl font-bold mb-4"></h1>
-
-  <!-- Formulario para crear/editar entidad -->
-  <div id="crud-form" class="mb-8">
-    <form id="entityForm" class="bg-white p-6 rounded-lg shadow-lg">
-      <!-- Campos dinámicos -->
-      <div id="form-fields"></div>
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">
-        Guardar
-      </button>
-    </form>
-  </div>
 
   <!-- Tabla de entidades -->
   <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
@@ -32,5 +22,57 @@
       <!-- Contenido dinámico -->
     </tbody>
   </table>
+
+  <!-- Formulario - Create -->
+  <div id="modal-create"
+    class="z-10 fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="modalContent"
+      class="bg-white p-6 rounded shadow-lg max-w-sm w-full transform scale-95 transition-transform duration-300">
+      <h2 class="text-xl font-semibold mb-4">Crear</h2>
+      <div id="body">
+        <form id="modal-create-entity-form">
+          <div id="modal-create-form-fields">
+            <!-- Contenido dinámico -->
+          </div>
+        </form>
+      </div>
+      <div class="flex justify-end gap-6">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Guardar</button>
+        <button id="close-create-modal" class="bg-gray-50px-4 py-2 rounded mt-4">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario - Update -->
+  <div id="modal-update"
+    class="z-10 fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="modalContent"
+      class="bg-white p-6 rounded shadow-lg max-w-sm w-full transform scale-95 transition-transform duration-300">
+      <h2 class="text-xl font-semibold mb-4">Editar</h2>
+      <div id="body">
+        <form id="modal-update-entity-form">
+          <div id="form-fields">
+            <div id="modal-update-form-fields">
+              <!-- Contenido dinámico -->
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="flex justify-end gap-6">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Guardar</button>
+        <button id="close-update-modal" class="bg-gray-50px-4 py-2 rounded mt-4">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Boton flotante -->
+  <button id="open-create-modal"
+    class="z-0 fixed bottom-8 right-8 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg focus:outline-none disabled:pointer-events-none disabled:bg-gray-400">
+    <svg height="16px" width="16px" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+      enable-background="new 0 0 32 32">
+      <path d="M28 14H18V4a2 2 0 0 0-4 0v10H4a2 2 0 0 0 0 4h10v10a2 2 0 0 0 4 0V18h10a2 2 0 0 0 0-4z" fill="#ffffff"
+        class="fill-000000"></path>
+    </svg>
+  </button>
 </div>
 {% endblock content %}
