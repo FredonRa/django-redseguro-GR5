@@ -22,7 +22,7 @@ class _CrudService {
     }
 
     // Crear un nuevo entidad
-    async post(data) {
+    async create(data) {
         return await this.client.post(``, data);
     }
 

@@ -16,7 +16,6 @@ window.addEventListener('DOMContentLoaded', async function () {
         overlay.classList.add('hidden');
     }
     overlay.addEventListener('click', () => {
-        console.log("holaaa")
         closeSidebar();
     });
 

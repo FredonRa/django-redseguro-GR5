@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             formUpdateFieldsContainer.appendChild(formGroup);
         });
 
-        formCreate.onsubmit = handleFormSubmit;
-        formUpdate.onsubmit = handleFormSubmit;
+        formCreate.onsubmit = handleFormCreateSubmit;
+        formUpdate.onsubmit = handleFormUpdateSubmit;
     }
 
     // Función para crear el grupo de formulario (label + input/select)
@@ -83,13 +83,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Función para manejar el envío de formularios
-    async function handleFormSubmit(event) {
+    async function handleFormCreateSubmit(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         const entityData = Object.fromEntries(formData.entries());
 
         try {
             await CrudService.create(entityData);
+            alert(`${entityName} guardado correctamente!`);
+            const updatedData = await CrudService.getAll();
+            buildTable(updatedData);
+        } catch (error) {
+            handleError(error);
+        }
+    }
+
+    async function handleFormUpdateSubmit(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const entityData = Object.fromEntries(formData.entries());
+
+        try {
+            await CrudService.put(entityData);
             alert(`${entityName} guardado correctamente!`);
             const updatedData = await CrudService.getAll();
             buildTable(updatedData);
