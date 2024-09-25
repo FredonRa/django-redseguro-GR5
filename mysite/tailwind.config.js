@@ -1,7 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-      './templates/**/*.html'
+    './templates/**/*.html'
+  ],
+  safelist: [
+    "disabled:bg-gray-200"
   ],
   theme: {
     extend: {},

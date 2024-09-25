@@ -1,4 +1,5 @@
 from django.db import models
+from conversaciones.models import Conversacion
 
 # Create your models here.
 

@@ -5,11 +5,12 @@ class ConversacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversacion
         fields = '__all__'
+        read_only_fields = ['fecha_fin']
 
     def create(self, validated_data):
         return Conversacion.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        instance.fecha_fin = validated_data.get('fecha_fin', instance.fecha_fin)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     instance.fecha_fin = validated_data.get('fecha_fin', instance.fecha_fin)
+    #     instance.save()
+    #     return instance

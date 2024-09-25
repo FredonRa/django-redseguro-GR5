@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'gestiones',
     'pasos',
     'opciones',
-    'respuestas'
+    'respuestas',
+    'backoffice'
 ]
 
 MIDDLEWARE = [
@@ -56,9 +57,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'myapp.exceptions.custom_exception_handler',
-}
+# REST_FRAMEWORK = {
+#     'EXCEPTION_HANDLER': 'myapp.exceptions.custom_exception_handler',
+# }
 
 ROOT_URLCONF = 'mysite.urls'
 
