@@ -154,7 +154,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             input.type = field.type;
             input.placeholder = formatFieldName(field.name);
         } else {
-            console.log(field)
             await populateSelectOptions(input, field.options, field.name);
         }
         return input;
