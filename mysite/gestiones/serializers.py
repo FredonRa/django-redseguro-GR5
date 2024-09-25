@@ -11,8 +11,7 @@ class GestionSerializer(serializers.ModelSerializer):
         return Gestion.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.id_gestion = validated_data.get('id gestion', instance.id_gestion)
-        instance.nombre_gestion= validated_data.get('nombre_gestion', instance.nombre_gestion)
+        instance.nombre = validated_data.get('nombre', instance.nombre)
         instance.descripcion = validated_data.get('descripcion', instance.descripcion)
         instance.save()
         return instance

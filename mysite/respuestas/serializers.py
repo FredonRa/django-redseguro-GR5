@@ -4,7 +4,7 @@ from .models import Respuesta
 class RespuestaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Respuesta
-        fields = ['opcion', 'contenido']
+        fields = ['respuesta_id', 'opcion', 'contenido']
 
     def create(self, validated_data):
         return Respuesta.objects.create(**validated_data)

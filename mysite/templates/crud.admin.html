@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="container mx-auto py-8">
-  <h1 id="crud-title" class="text-3xl font-bold mb-4"></h1>
+  <h1 id="crud-title" class="capitalize text-3xl font-bold mb-4"></h1>
 
   <!-- Tabla de entidades -->
   <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
@@ -30,7 +30,7 @@
       class="bg-white p-6 rounded shadow-lg max-w-sm w-full transform scale-95 transition-transform duration-300">
       <h2 class="text-xl font-semibold mb-4">Crear</h2>
       <div id="body">
-        <form id="modal-create-entity-form">
+        <form id="modal-create-entity-form" novalidate>
           <div id="modal-create-form-fields">
             <!-- Contenido dinámico -->
           </div>
@@ -50,7 +50,8 @@
       class="bg-white p-6 rounded shadow-lg max-w-sm w-full transform scale-95 transition-transform duration-300">
       <h2 class="text-xl font-semibold mb-4">Editar</h2>
       <div id="body">
-        <form id="modal-update-entity-form">
+        <form id="modal-update-entity-form" novalidate>
+          <input type="hidden" name="entity_id" id="entity-id">
           <div id="form-fields">
             <div id="modal-update-form-fields">
               <!-- Contenido dinámico -->

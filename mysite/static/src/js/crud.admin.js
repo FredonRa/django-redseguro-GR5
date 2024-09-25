@@ -10,23 +10,59 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("crud-title").textContent = `${entityName}`;
 
     // Configuración de formularios y tabla
-    try {
-        const [data, fields, actions] = await Promise.all([
-            CrudService.getAll(),
-            CrudService.getFields(),
-            CrudService.getActions(),
-        ]);
+    getDataTable()
 
-        buildTable(data, fields);
-        if (fields) buildForm(fields);
-        if (actions) handleActions(actions, CrudService, fields);
-    } catch (error) {
-        console.error(error)
-        // handleError(error);
+    function clearValidationErrors(form) {
+        const errorMessages = form.querySelectorAll('.text-red-500');
+        errorMessages.forEach(error => error.remove());
+    }
+
+    // Función para validar el formulario
+    async function validateForm(form, fields) {
+        clearValidationErrors(form)
+        let isValid = true;
+        const errors = {};
+
+        fields.forEach(field => {
+            const input = form.querySelector(`[name="${field.name}"]`);
+
+            if (input) {
+                // Validación de campos requeridos
+                if (field.required && !input.value) {
+                    isValid = false;
+                    errors[field.name] = `${formatFieldName(field.name)} es requerido.`;
+                }
+
+                // Ejemplo de validación de tipos
+                if (input.type === 'number' && isNaN(input.value)) {
+                    isValid = false;
+                    errors[field.name] = `${formatFieldName(field.name)} debe ser un número válido.`;
+                }
+            }
+
+            // Puedes agregar más validaciones aquí según el tipo de campo (email, datetime, etc.)
+        });
+
+        if (!isValid) {
+            showValidationErrors(errors);
+        }
+
+        return isValid;
+    }
+
+    // Mostrar errores en la interfaz
+    function showValidationErrors(errors) {
+        Object.keys(errors).forEach(fieldName => {
+            const input = document.querySelector(`[name="${fieldName}"]`);
+            const errorElement = document.createElement('p');
+            errorElement.className = 'text-red-500 text-sm';
+            errorElement.textContent = errors[fieldName];
+            input.parentElement.appendChild(errorElement);
+        });
     }
 
     // Función para construir el formulario
-    function buildForm(fields) {
+    async function buildForm(fields) {
         const formCreate = document.getElementById("modal-create-entity-form");
         const formUpdate = document.getElementById("modal-update-entity-form");
         const formCreateFieldsContainer = document.getElementById("modal-create-form-fields");
@@ -35,24 +71,63 @@ document.addEventListener("DOMContentLoaded", async () => {
         formCreateFieldsContainer.innerHTML = '';
         formUpdateFieldsContainer.innerHTML = '';
 
-        fields.forEach(field => {
-            const formGroup = createFormGroup(field);
-            if (field.editable) formCreateFieldsContainer.appendChild(formGroup.cloneNode(true));
-            formUpdateFieldsContainer.appendChild(formGroup);
+        fields.forEach(async field => {
+            if (field.editable) {
+                const formGroup = await createFormGroup(field);
+                formCreateFieldsContainer.appendChild(formGroup.cloneNode(true));
+                formUpdateFieldsContainer.appendChild(formGroup);
+            }
         });
 
-        formCreate.onsubmit = handleFormCreateSubmit;
-        formUpdate.onsubmit = handleFormUpdateSubmit;
+        formCreate.onsubmit = async (event) => {
+            event.preventDefault();
+            const isValid = await validateForm(formCreate, fields);
+            if (!isValid) return;
+
+            const formData = new FormData(event.target);
+            const entityData = Object.fromEntries(formData.entries());
+
+            try {
+                await CrudService.create(entityData);
+                showAlert("success", "Entidad creada correctamente")
+                closeModal("modal-create");
+
+                getDataTable();
+            } catch (error) {
+                showAlert("error", error.message)
+            }
+        };
+
+        formUpdate.onsubmit = async (event) => {
+            event.preventDefault();
+            const isValid = await validateForm(formUpdate, fields);
+            if (!isValid) return;
+
+            const formData = new FormData(event.target);
+            const entityId = formData.get('entity_id');
+            formData.delete("entity_id")
+
+            const entityData = Object.fromEntries(formData.entries());
+
+            // Obtener el ID de la entidad desde el campo oculto
+            try {
+                await CrudService.update(entityId, entityData);
+                showAlert("success", "Entidad actualizada correctamente")
+                closeModal("modal-update");
+                getDataTable();
+            } catch (error) {
+                showAlert("error", error.message)
+            }
+        };
     }
 
     // Función para crear el grupo de formulario (label + input/select)
-    function createFormGroup(field) {
+    async function createFormGroup(field) {
         const formGroup = document.createElement('div');
         formGroup.className = 'mb-4';
 
         const label = createLabel(field.name);
-        const inputOrSelect = createInput(field);
-
+        const inputOrSelect = await createInput(field);
         formGroup.appendChild(label);
         formGroup.appendChild(inputOrSelect);
 
@@ -67,50 +142,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         return label;
     }
 
-    function createInput(field) {
+    async function createInput(field) {
         const input = field.type === 'select' ? document.createElement('select') : document.createElement('input');
         const isEditableInput = field.editable;
         input.name = field.name;
         input.id = field.name;
         input.className = 'border px-4 py-2 w-full mt-2 rounded-md disabled:pointer-events-none disabled:bg-gray-200';
         input.disabled = !isEditableInput;
-
+        input.required = true;
         if (field.type !== 'select') {
             input.type = field.type;
             input.placeholder = formatFieldName(field.name);
+        } else {
+            console.log(field)
+            await populateSelectOptions(input, field.options, field.name);
         }
         return input;
-    }
-
-    // Función para manejar el envío de formularios
-    async function handleFormCreateSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const entityData = Object.fromEntries(formData.entries());
-
-        try {
-            await CrudService.create(entityData);
-            alert(`${entityName} guardado correctamente!`);
-            const updatedData = await CrudService.getAll();
-            buildTable(updatedData);
-        } catch (error) {
-            handleError(error);
-        }
-    }
-
-    async function handleFormUpdateSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const entityData = Object.fromEntries(formData.entries());
-
-        try {
-            await CrudService.put(entityData);
-            alert(`${entityName} guardado correctamente!`);
-            const updatedData = await CrudService.getAll();
-            buildTable(updatedData);
-        } catch (error) {
-            handleError(error);
-        }
     }
 
     // Función para construir la tabla
@@ -149,6 +196,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             tableBody.appendChild(tr);
         });
     }
+
+    async function getDataTable() {
+        // Configuración de formularios y tabla
+        try {
+            const [data, fields, actions] = await Promise.all([
+                CrudService.getAll(),
+                CrudService.getFields(),
+                CrudService.getActions(),
+            ]);
+
+            buildTable(data, fields);
+            if (fields) await buildForm(fields);
+            if (actions) handleActions(actions, CrudService);
+        } catch (error) {
+            console.error(error)
+            // handleError(error);
+        }
+    }
+
 
     // Función para crear la td de acciones
     function createActionsCell(entityId) {
@@ -191,11 +257,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Función para manejar las acciones de create/edit/delete(para futuro)
-    function handleActions(actions, service, fields) {
+    function handleActions(actions, service) {
         const { crear, editar } = actions;
 
         if (crear) setupModal("modal-create", "open-create-modal", service);
-        if (editar) setupUpdateModal("modal-update", "open-update-modal", service, fields);
+        if (editar) setupUpdateModal("modal-update", "open-update-modal", service);
     }
 
     function setupModal(modalId, triggerId) {
@@ -211,7 +277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    function setupUpdateModal(modalId, triggerClass, service, fields) {
+    function setupUpdateModal(modalId, triggerClass, service) {
         const modal = document.getElementById(modalId);
         const openModalBtns = document.querySelectorAll(`.${triggerClass}`);
         const closeModalBtn = modal.querySelector('#close-update-modal');
@@ -220,8 +286,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             btn.addEventListener('click', async () => {
                 const entityId = btn.dataset.id;
                 try {
+                    // Llenar el campo oculto con el ID de la entidad
+                    document.getElementById('entity-id').value = entityId;
+
                     const entityData = await service.getById(entityId);
-                    fillUpdateForm(entityData, fields);
+                    fillUpdateForm(entityData);
                     toggleModal(modal, true);
                 } catch (error) {
                     handleError(error);
@@ -251,6 +320,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        toggleModal(modal, false)
+    }
+
     // Funciones auxiliares
     function formatFieldName(name) {
         return name.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -278,8 +352,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Ha ocurrido un error, por favor intenta de nuevo.");
     }
 
-    async function fillUpdateForm(data, fields) {
+    async function fillUpdateForm(data) {
         const updateForm = document.getElementById('modal-update-entity-form');
+        for (const key of Object.keys(data)) {
+            const input = updateForm.querySelector(`[name="${key}"]`);
+            if (!input || !data[key]) continue;
+
+            input.value = input.type === "datetime-local" ? formatDateToISO(data[key]) : data[key];
+        }
+    }
+
+    async function populateSelectOptions(input, entityOptions, model) {
         const modelsApi = {
             usuario: "usuarios",
             conversacion: "conversaciones",
@@ -288,31 +371,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             opcion: "opciones",
             respuesta: "respuestas"
         };
-
-        for (const key of Object.keys(data)) {
-            const input = updateForm.querySelector(`[name="${key}"]`);
-            if (!input || !data[key]) continue;
-
-            if (input.type === "select-one") {
-                await populateSelectOptions(input, key, modelsApi[key], fields);
-            } else {
-                input.value = input.type === "datetime-local" ? formatDateToISO(data[key]) : data[key];
-            }
-        }
-    }
-
-    async function populateSelectOptions(input, key, model, fields) {
-        const CrudService = new _CrudService(model);
-
+        const CrudService = new _CrudService(modelsApi[model]);
         try {
             const data = await CrudService.getAll();
-            const entityOptions = fields.find(field => field.name === key)?.options || [];
+            // const entityOptions = fields.find(field => field.name === key)?.options || [];
 
             data.forEach(entity => {
                 const [entityIdField, ...entityValueFields] = entityOptions;
                 const entityId = entity[entityIdField];
                 const entityValues = entityValueFields.map(field => entity[field]);
-
                 const option = document.createElement('option');
                 option.value = entityId;
                 option.text = `#${entityId} - ${concatenateStrings(entityValues)}`;

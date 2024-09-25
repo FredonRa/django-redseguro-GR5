@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Respuesta
 from .serializers import RespuestaSerializer
+from mysite.utils.views import ModelFieldsBaseView, ModelActionsBaseView
 
 class RespuestaViewSet(viewsets.ModelViewSet):
     queryset = Respuesta.objects.all()
@@ -14,3 +15,13 @@ class RespuestaViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data)
+    
+class RespuestaFieldsView(ModelFieldsBaseView):
+    model = Respuesta
+
+class RespuestaActionsView(ModelActionsBaseView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.crear = True
+        self.editar = True
+        self.eliminar = True
