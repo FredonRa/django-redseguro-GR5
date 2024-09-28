@@ -25,5 +25,6 @@ urlpatterns = [
     path('api/', include('pasos.urls')),
     path('api/', include('opciones.urls')),
     path('api/', include('respuestas.urls')),
+    path('bot/', include('botAsistente.urls')),
     path('backoffice/', include('backoffice.urls')),
 ]
