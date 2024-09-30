@@ -20,9 +20,9 @@
     {% endcompress %}
 
     {% compress js %}
+    <script type="module" src="{% static 'src/js/HttpClient.js' %}"></script>
     <script src="{% static 'src/js/navbar.js' %}"></script>
     <script src="{% static 'src/js/alert.js' %}"></script>
-    <script type="module" src="{% static 'src/js/HttpClient.js' %}"></script>
         {% block javascript %}
         {% endblock javascript %}
     {% endcompress %}
@@ -37,6 +37,7 @@
     <main class="container mx-auto flex-1 mt-16 justify-center items-center min-h-screen">
         {% block content %}
         {% endblock content %}
+        {% include "botAsistente.html" %}
     </main>
 </body>
  

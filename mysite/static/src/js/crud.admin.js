@@ -367,6 +367,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             conversacion: "conversaciones",
             gestion: "gestiones",
             paso: "pasos",
+            siguiente_paso: "pasos",
             opcion: "opciones",
             respuesta: "respuestas"
         };

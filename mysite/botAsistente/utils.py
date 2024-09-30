@@ -10,9 +10,43 @@ from pasos.models import Paso
 from opciones.models import Opcion
 from respuestas.models import Respuesta
 
+from conversaciones.serializers import ConversacionSerializer, ConversacionGestionSerializer
 from gestiones.serializers import GestionSerializer
 from opciones.serializers import OpcionSerializer
 from respuestas.serializers import RespuestaSerializer
+
+def conversacion_existente(conversacion_existente):
+    # Serializar la conversación principal
+    conversacion_data = ConversacionSerializer(conversacion_existente).data
+    
+    # Obtener la gestión relacionada a la conversación (solo una)
+    gestion = Conversacion_Gestion.objects.filter(conversacion=conversacion_existente.conversacion_id).first()
+    
+    # Si hay una gestión, serializarla; si no, devolver None
+    if gestion:
+        gestion_data = ConversacionGestionSerializer(gestion).data
+    else:
+        gestion_data = None
+
+    # Agregar la gestión a la respuesta
+    conversacion_data['gestion'] = gestion_data
+    return conversacion_data
+
+def listar_conversaciones_anteriores(usuario_id):
+    # Obtener las conversaciones anteriores del usuario 
+    conversaciones_anteriores  = Conversacion.objects.filter(usuario=usuario_id, fecha_fin__isnull=False)
+    
+    # Lista para almacenar las conversaciones serializadas
+    conversaciones_data = []
+
+    for conversacion in conversaciones_anteriores:
+        # Llamar al método conversacion_existente para serializar cada conversación
+        response = conversacion_existente(conversacion)
+        
+        # Extraer el contenido de la respuesta
+        conversaciones_data.append(response)
+
+    return Response(conversaciones_data, status=200)
 
 def iniciar_conversacion(request):
     """
@@ -33,10 +67,7 @@ def iniciar_conversacion(request):
     conversacion_abierta = Conversacion.objects.filter(usuario=usuario, fecha_fin__isnull=True).first()
 
     if conversacion_abierta:
-        return Response({
-            'error': 'Ya tienes una conversación en curso',
-            'conversacion_id': conversacion_abierta.conversacion_id
-        }, status=status.HTTP_400_BAD_REQUEST)
+        return Response(conversacion_existente(conversacion_abierta), status=200)
 
     # Si no hay conversaciones abiertas, crear una nueva conversación
     conversacion = Conversacion.objects.create(usuario=usuario)
@@ -55,21 +86,21 @@ def listar_gestiones():
     gestiones_serializadas = GestionSerializer(gestiones, many=True).data
     return Response({'gestiones': gestiones_serializadas}, status=status.HTTP_200_OK)
 
-
 def seleccionar_gestion(request):
     """
     Con la gestión seleccionada, iniciar el primer paso de la conversación y enviar opciones.
     """
-    conversacion_id = request.data.get('conversacion_id')
+    # conversacion_id = request.data.get('conversacion_id')
     gestion_id = request.data.get('gestion_id')
-
+    conversacion_abierta = Conversacion.objects.filter(conversacion_id=54, fecha_fin__isnull=True).first()
+    conversacion_id = conversacion_abierta.conversacion_id
     if not conversacion_id or not gestion_id:
         return Response({'error': 'conversacion_id y gestion_id son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
 
     conversacion = get_object_or_404(Conversacion, conversacion_id=conversacion_id)
 
     # Verificar si ya hay una gestión activa en la conversación (sin fecha_fin)
-    gestion_activa = Conversacion_Gestion.objects.filter(conversacion=conversacion).first()
+    gestion_activa = Conversacion_Gestion.objects.filter(conversacion=conversacion_abierta).first()
 
     if gestion_activa:
         return Response({
@@ -115,7 +146,22 @@ def obtener_opciones(conversacion_gestion_id, paso):
         'conversacion_gestion_id': conversacion_gestion_id,
         'opciones': opciones_serializadas.data
     }, status=status.HTTP_200_OK)
+    
+def listar_opciones():
+    """
+    Envía las gestiones disponibles (ya guardadas en la base de datos).
+    """
+    opciones = Opcion.objects.all()
+    opciones_serializadas = OpcionSerializer(opciones, many=True).data
+    return Response({'opciones': opciones_serializadas}, status=status.HTTP_200_OK)
 
+def listar_respuestas():
+    """
+    Envía las gestiones disponibles (ya guardadas en la base de datos).
+    """
+    respuestas = Respuesta.objects.all()
+    respuestas_serializadas = RespuestaSerializer(respuestas, many=True).data
+    return Response({'respuestas': respuestas_serializadas}, status=status.HTTP_200_OK)
 
 def seleccionar_opcion(request):
     """
@@ -123,8 +169,9 @@ def seleccionar_opcion(request):
     """
     conversacion_gestion_id = request.data.get('conversacion_gestion_id')
     opcion_id = request.data.get('opcion_id')
+    paso_id = request.data.get('paso_id')
 
-    conversacion_paso = get_object_or_404(Conversacion_Paso, conversacion_gestion=conversacion_gestion_id)
+    conversacion_paso = get_object_or_404(Conversacion_Paso, conversacion_gestion=conversacion_gestion_id, paso=paso_id)
     opcion = get_object_or_404(Opcion, opcion_id=opcion_id)
 
     Conversacion_Opcion.objects.create(conversacion_paso=conversacion_paso, opcion_id=opcion.opcion_id)
