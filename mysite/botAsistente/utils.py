@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.db.models import Exists, OuterRef
 
 from conversaciones.models import Conversacion, Conversacion_Gestion, Conversacion_Paso, Conversacion_Opcion
 from usuarios.models import Usuario
@@ -80,19 +81,33 @@ def iniciar_conversacion(request):
 
 def listar_gestiones():
     """
-    Envía las gestiones disponibles (ya guardadas en la base de datos).
+    Envía las gestiones disponibles que tienen opciones con al menos una respuesta.
     """
-    gestiones = Gestion.objects.all()
-    gestiones_serializadas = GestionSerializer(gestiones, many=True).data
-    return Response({'gestiones': gestiones_serializadas}, status=status.HTTP_200_OK)
+    gestiones = Gestion.objects.filter(
+        Exists(
+            Paso.objects.filter(gestion=OuterRef('pk')).filter(
+                Exists(
+                    Opcion.objects.filter(paso=OuterRef('pk')).filter(
+                        Exists(
+                            Respuesta.objects.filter(opcion=OuterRef('pk'))
+                        )
+                    )
+                )
+            )
+        )
+    )
 
+    gestiones_serializadas = GestionSerializer(gestiones, many=True).data
+
+    return Response({'gestiones': gestiones_serializadas}, status=status.HTTP_200_OK)
+    
 def seleccionar_gestion(request):
     """
     Con la gestión seleccionada, iniciar el primer paso de la conversación y enviar opciones.
     """
     # conversacion_id = request.data.get('conversacion_id')
     gestion_id = request.data.get('gestion_id')
-    conversacion_abierta = Conversacion.objects.filter(conversacion_id=54, fecha_fin__isnull=True).first()
+    conversacion_abierta = Conversacion.objects.filter(conversacion_id=60, fecha_fin__isnull=True).first()
     conversacion_id = conversacion_abierta.conversacion_id
     if not conversacion_id or not gestion_id:
         return Response({'error': 'conversacion_id y gestion_id son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
@@ -149,9 +164,15 @@ def obtener_opciones(conversacion_gestion_id, paso):
     
 def listar_opciones():
     """
-    Envía las gestiones disponibles (ya guardadas en la base de datos).
+    Envía las gestiones disponibles (ya guardadas en la base de datos)
+    que tengan al menos una respuesta.
     """
-    opciones = Opcion.objects.all()
+    opciones = Opcion.objects.filter(
+        Exists(
+            Respuesta.objects.filter(opcion=OuterRef('pk'))
+        )
+    )
+
     opciones_serializadas = OpcionSerializer(opciones, many=True).data
     return Response({'opciones': opciones_serializadas}, status=status.HTTP_200_OK)
 
