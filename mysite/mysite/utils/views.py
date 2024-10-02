@@ -24,7 +24,8 @@ class ModelFieldsBaseView(APIView):
             field_info = {
                 'name': field.name,
                 'type': field_type,
-                'editable': field.editable and not field.primary_key
+                'editable': field.editable and not field.primary_key,
+                'null': field.null
             }
 
             if isinstance(field, ForeignKey):

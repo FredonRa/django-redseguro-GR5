@@ -7,5 +7,5 @@ from opciones.models import Opcion
 # Create your models here.
 class Respuesta(models.Model):
     respuesta_id = models.AutoField(primary_key=True)
-    opcion = models.ForeignKey(Opcion, on_delete=models.CASCADE, blank=True, null=True, related_name='+')
+    opcion = models.ForeignKey(Opcion, on_delete=models.CASCADE, blank=True, null=False, related_name='+', default=1)
     contenido = models.CharField(null=False, max_length=255)
