@@ -20,6 +20,7 @@ const submit = async (usuario) => {
     await AuthService.authUsuario(usuario)
         .then(data => {
             showAlert("success", "Usuario autenticado correctamente.");
+            window.location.href = '/home/';
             // Aquí puedes redirigir al usuario o hacer algo más después de un login exitoso
             return data;
         })

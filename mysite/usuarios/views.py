@@ -7,7 +7,15 @@ from .exceptions import NombreError, ApellidoError, EmailError, ContraseniaError
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login,logout
 from django.http import JsonResponse
+from rest_framework.views import APIView
 
+#Create your views here
+def index (req):
+    return render(req, "registro.html")
+def login (req):
+    return render(req, "login.html")
+def home (req):
+    return render(req, "home.html")
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -49,13 +57,24 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'message': 'Ocurrió un problema con el servidor, vuelva a intentar en unos minutos.', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-
-def index (req):
-    return render(req, "registro.html")
-def login (req):
-    return render(req, "login.html")
-
-# Create your views here.
+class LoginView(APIView):
+    def post(self,request, *args, **kwargs):
+        email = request.data.get('email')
+        contrasenia = request.data.get('contrasenia')
+        usuario = Usuario.objects.filter(email=email).first()
+              
+        if usuario is None:
+            return JsonResponse({"message": "Credenciales incorrectas"}, status=401) 
+        
+        
+        if usuario.contrasenia ==  contrasenia:
+            return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)          
+        else:
+            return JsonResponse({"message": "Credenciales incorrectas"}, status=401)
+   
+  
+    
+    # Create your views here.
 # @login_required
 # def index (req):
 #      return render(req, "index.html")
@@ -64,14 +83,4 @@ def login (req):
 #     logout(req)
 #     return redirect('/') 
 
-def login_view(request):
-    #if request.method == "POST":
-        email = request.POST.get('email')
-        contrasenia = request.POST.get('contrasenia')
-        #user = authenticate(request, username=username, password=password)
-        return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
-    # if user is not None:
-    #          login(request, user)
-    # else:
-    #          return JsonResponse({"error": "Credenciales inválidas"}, status=400)
-    # return render(request, 'login.html')
+ 

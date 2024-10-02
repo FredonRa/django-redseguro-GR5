@@ -20,5 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('usuarios.urls')),
-    path('api/', include('conversaciones.urls')),
+    path('api/', include('conversaciones.urls')),   
+    #path('home', include('home.urls')), #from django.shortcuts import redirect
 ]
