@@ -107,7 +107,7 @@ def seleccionar_gestion(request):
     """
     # conversacion_id = request.data.get('conversacion_id')
     gestion_id = request.data.get('gestion_id')
-    conversacion_abierta = Conversacion.objects.filter(conversacion_id=60, fecha_fin__isnull=True).first()
+    conversacion_abierta = Conversacion.objects.filter(conversacion_id=86, fecha_fin__isnull=True).first()
     conversacion_id = conversacion_abierta.conversacion_id
     if not conversacion_id or not gestion_id:
         return Response({'error': 'conversacion_id y gestion_id son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
