@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             input.type = field.type;
             input.placeholder = formatFieldName(field.name);
         } else {
-            await populateSelectOptions(input, field.options, field.name);
+            await populateSelectOptions(input, field.options, field.name, field.null);
         }
         return input;
     }
@@ -361,12 +361,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    async function populateSelectOptions(input, entityOptions, model) {
+    async function populateSelectOptions(input, entityOptions, model, isNullable) {
         const modelsApi = {
             usuario: "usuarios",
             conversacion: "conversaciones",
             gestion: "gestiones",
             paso: "pasos",
+            siguiente_paso: "pasos",
             opcion: "opciones",
             respuesta: "respuestas"
         };
@@ -374,6 +375,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const data = await CrudService.getAll();
             // const entityOptions = fields.find(field => field.name === key)?.options || [];
+
+            if (isNullable) {
+                const option = document.createElement('option');
+                option.text = "";
+                option.value = "";
+                input.appendChild(option);
+            }
 
             data.forEach(entity => {
                 const [entityIdField, ...entityValueFields] = entityOptions;

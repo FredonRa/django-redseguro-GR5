@@ -22,3 +22,5 @@ class OpcionFieldsView(ModelFieldsBaseView):
 class OpcionActionsView(ModelActionsBaseView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.crear = True
+        self.editar = True
