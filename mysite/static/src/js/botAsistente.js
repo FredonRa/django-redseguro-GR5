@@ -144,10 +144,9 @@ class BotUI {
 
     async handleGestionSelection(gestion_id, nombre) {
         try {
-            const gestionSeleccionadaDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-col");
-
             const { conversacion_gestion_id, opciones } = await BotService.selectGestion({ gestion_id });
-            this.createUserMessage(this.mensajes, nombre)
+            this.createUserMessage(this.mensajes, nombre);
+            this.disableButtons(this.mensajes.id);
             await this.listOpciones(opciones, conversacion_gestion_id);
         } catch (error) {
             console.error("Error selecting gestion:", error);
@@ -172,6 +171,7 @@ class BotUI {
         try {
             const { respuestas, opciones } = await BotService.selectOpcion({ opcion_id, conversacion_gestion_id, paso_id });
             this.createUserMessage(this.mensajes, nombre)
+            this.disableButtons(this.mensajes.id);
             if (opciones) await this.listOpciones(opciones, conversacion_gestion_id);
             if (respuestas) this.listRespuestas(respuestas);
         } catch (error) {
