@@ -72,7 +72,7 @@ class BotUI {
     async showPreviousConversations() {
         try {
             this.listarConversacionesAnteriores = true;
-            await Promise.all(this.conversacionesAnteriores.map(conversacion => this.displayPreviousConversation(conversacion)));
+            await Promise.all(this.conversacionesAnteriores.map(async (conversacion) => this.displayPreviousConversation(conversacion)));
             document.getElementById("fecha-fin-container").classList.remove('hidden');
             this.verConversacionesAnterioresBtn.classList.add("hidden");
             this.disableButtons("mensajes-anteriores");
@@ -83,7 +83,7 @@ class BotUI {
         }
     }
 
-    createFechaInicio(fecha) {
+    createFechaInicio(fecha, container) {
         const formattedDate = this.formatDateToISO(fecha);
         const fechaInicioContainer = this.createElement('div', 'w-full py-5 border-t-2 border-gray-200 flex justify-center mt-5');
         const fechaInicio = this.createElement('span', '-mt-10 bg-indigo-300 p-2 px-3 rounded-lg', formattedDate);
@@ -93,8 +93,10 @@ class BotUI {
 
     async displayPreviousConversation(conversacion) {
         const fechaInicio = this.createFechaInicio(conversacion.fecha_inicio);
-        this.mensajesAnteriores.appendChild(fechaInicio);
-        await this.listConversation(conversacion.gestion, this.mensajesAnteriores);
+        const containerConversacion = this.createElement('div');
+        this.mensajesAnteriores.appendChild(containerConversacion)
+        containerConversacion.appendChild(fechaInicio);
+        await this.listConversation(conversacion.gestion, containerConversacion);
     }
 
     async listConversation(gestion, container = this.mensajes) {
@@ -102,12 +104,13 @@ class BotUI {
 
         const { conversacion_gestion_id, nombre, pasos } = gestion;
         const containerGestion = this.createElement('div');
-        this.listGestiones(this.gestiones, container);
-        this.createMessage(containerGestion, nombre, true);
+        await this.listGestiones(this.gestiones, container);
+
+        this.createUserMessage(containerGestion, nombre, true)
         container.appendChild(containerGestion);
 
         if (pasos) {
-            this.disableButtons(container.id);
+
             for (const paso of pasos) {
                 await this.handlePaso(paso, conversacion_gestion_id, container);
             }
@@ -121,8 +124,9 @@ class BotUI {
 
         if (opcion) {
             const { nombre, respuestas } = opcion;
-            this.createMessage(container, nombre, true);
-            if (respuestas) this.listRespuestas(respuestas, this.mensajesAnteriores);
+            // this.createMessage(true);
+            this.createUserMessage(container, nombre)
+            if (respuestas) this.listRespuestas(respuestas, container);
         }
     }
 
@@ -130,20 +134,20 @@ class BotUI {
         const containerGestiones = this.createElement('div', "flex flex-col gap-2");
         const gestionesDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-col");
 
-        this.createMessage(containerGestiones, "Para comenzar, seleccione una gestión:", false);
-
         gestiones.forEach(({ gestion_id, nombre }) => {
             this.createButton(gestionesDiv, gestion_id, nombre, () => this.handleGestionSelection(gestion_id, nombre));
         });
 
-        containerGestiones.appendChild(gestionesDiv);
-        this.createBotMessage(containerGestiones, container)
+        this.createBotMessage(gestionesDiv, containerGestiones, "Para comenzar, seleccione una gestión:");
+        container.appendChild(containerGestiones);
     }
 
     async handleGestionSelection(gestion_id, nombre) {
         try {
+            const gestionSeleccionadaDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-col");
+
             const { conversacion_gestion_id, opciones } = await BotService.selectGestion({ gestion_id });
-            this.createMessage(this.mensajes, nombre, true);
+            this.createUserMessage(this.mensajes, nombre)
             await this.listOpciones(opciones, conversacion_gestion_id);
         } catch (error) {
             console.error("Error selecting gestion:", error);
@@ -153,9 +157,6 @@ class BotUI {
     async listOpciones(opciones, conversacion_gestion_id, container = this.mensajes) {
         const containerOpciones = this.createElement('div', "flex flex-col gap-2");
         const opcionesDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-col");
-        const textoOpciones = this.createElement('span', "", "");
-
-        this.createMessage(containerOpciones, "Seleccione una opción:", false);
 
         opciones.forEach(({ opcion_id, nombre, paso }) => {
             this.createButton(opcionesDiv, opcion_id, nombre, async () => {
@@ -163,14 +164,14 @@ class BotUI {
             });
         });
 
-        containerOpciones.appendChild(opcionesDiv);
-        this.createBotMessage(containerOpciones, container)
+        this.createBotMessage(opcionesDiv, containerOpciones, "Seleccione una opción:");
+        container.appendChild(containerOpciones);
     }
 
     async handleOpcionSelection(opcion_id, conversacion_gestion_id, paso_id, nombre) {
         try {
             const { respuestas, opciones } = await BotService.selectOpcion({ opcion_id, conversacion_gestion_id, paso_id });
-            this.createMessage(this.mensajes, nombre, true);
+            this.createUserMessage(this.mensajes, nombre)
             if (opciones) await this.listOpciones(opciones, conversacion_gestion_id);
             if (respuestas) this.listRespuestas(respuestas);
         } catch (error) {
@@ -198,9 +199,8 @@ class BotUI {
         if (!this.conversacionActiva) return;
         const container = this.createElement('div', "flex flex-col gap-2");
         const options = this.createContinuationOptions();
-        this.createMessage(container, "¿Desea realizar otra consulta?", false);
-        container.appendChild(options)
-        this.createBotMessage(container)
+        // container.appendChild(options)
+        this.createBotMessage(options, this.mensajes, "¿Desea realizar otra consulta?", false)
     }
 
     createContinuationOptions() {
@@ -208,6 +208,7 @@ class BotUI {
             {
                 text: "Si",
                 onclick: async () => {
+                    this.disableButtons(this.mensajes.id)
                     await this.startConversation();
                 }
             },
@@ -215,12 +216,12 @@ class BotUI {
                 text: "No",
                 onclick: async () => {
                     const containerRespuestas = this.createElement('div', 'flex flex-col gap-2');
-
+                    this.disableButtons(this.mensajes.id)
                     this.createMessage(containerRespuestas, "Muchas gracias por haberte comunicado.", false);
                     this.createMessage(containerRespuestas, "Recorda que ante cualquier consulta estoy aquí para ayudarte.", false);
                     this.createMessage(containerRespuestas, "¡Que tengas lindo día!", false);
 
-                    this.createBotMessage(containerRespuestas)
+                    this.createBotMessage(containerRespuestas, this.mensajes, null, false)
                 }
             }
         ];
@@ -229,9 +230,7 @@ class BotUI {
 
         options.forEach(({ text, onclick }) => {
             this.createButton(containerOpciones, "", text, async () => {
-                const containerMessage = this.createElement('div');
-                this.createMessage(containerMessage, text, true);
-                this.mensajes.appendChild(containerMessage);
+                this.createUserMessage(this.mensajes, text)
                 await onclick();
             });
         });
@@ -267,10 +266,9 @@ class BotUI {
         this.scrollToBottom();
     }
 
-    createBotMessage(content, container) {
+    createBotMessage(content, container, labelText) {
         // Crear el contenedor principal
         const messageContainer = this.createElement('div', 'flex items-start gap-4 mb-4 ');
-
         // Crear el contenedor para el avatar (parte izquierda)
         const avatarContainer = this.createElement('div', 'flex-shrink-0');
         const avatar = this.createElement('img', 'h-12 w-12 rounded-full', '', '', null);
@@ -279,12 +277,43 @@ class BotUI {
         avatarContainer.appendChild(avatar);
 
         // Crear el contenedor para el contenido (parte derecha)
-        const contentContainer = this.createElement('div', 'w-full pt-2');
-        contentContainer.appendChild(content); // Asignar el contenido que viene por parámetro
+        const contentContainer = this.createElement('div', 'flex flex-col w-full pt-2 gap-2');
+
+        if (labelText) this.createMessage(contentContainer, labelText, false)
 
         // Agregar avatar y contenido al contenedor principal
         messageContainer.appendChild(avatarContainer);
+        contentContainer.appendChild(content); // Asignar el contenido que viene por parámetro
         messageContainer.appendChild(contentContainer);
+
+        // Agregar el mensaje al contenedor de mensajes
+        if (container) {
+            container.appendChild(messageContainer)
+        } else {
+            this.mensajes.appendChild(messageContainer);
+        }
+        // Desplazarse hacia abajo automáticamente
+        this.scrollToBottom();
+    }
+
+    createUserMessage(container, text) {
+        // Crear el contenedor principal
+        const messageContainer = this.createElement('div', 'flex items-start gap-4 mb-4 ');
+
+        // Crear el contenedor para el avatar (parte izquierda)
+        const avatarContainer = this.createElement('div', 'flex-shrink-0');
+        const avatar = this.createElement('img', 'h-12 w-12 rounded-full', '', '', null);
+        avatar.src = femaleIcon; // Cambia esto por la URL del avatar del bot
+        avatar.alt = 'Female Avatar';
+        avatarContainer.appendChild(avatar);
+
+        // Crear el contenedor para el contenido (parte derecha)
+        const contentContainer = this.createElement('div', 'w-full pt-2');
+
+        this.createMessage(contentContainer, text, true)
+        // Agregar avatar y contenido al contenedor principal
+        messageContainer.appendChild(contentContainer);
+        messageContainer.appendChild(avatarContainer);
 
         // Agregar el mensaje al contenedor de mensajes
         if (container) {
