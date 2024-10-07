@@ -5,9 +5,13 @@ from .models import Usuario
 from .serializers import UsuarioSerializer
 from .exceptions import NombreError, ApellidoError, EmailError, ContraseniaError, EmailNotUniqueError
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate,login
 from django.http import JsonResponse
 from rest_framework.views import APIView
+from django.contrib.auth import logout
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+
 
 #Create your views here
 def index (req):
@@ -16,6 +20,8 @@ def login (req):
     return render(req, "login.html")
 def home (req):
     return render(req, "home.html")
+
+
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -56,31 +62,31 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             return Response({'message': str(e)}, status=e.status_code)
         except Exception as e:
             return Response({'message': 'Ocurrió un problema con el servidor, vuelva a intentar en unos minutos.', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 class LoginView(APIView):
     def post(self,request, *args, **kwargs):
         email = request.data.get('email')
         contrasenia = request.data.get('contrasenia')
         usuario = Usuario.objects.filter(email=email).first()
-              
+
         if usuario is None:
-            return JsonResponse({"message": "Credenciales incorrectas"}, status=401) 
-        
-        
-        if usuario.contrasenia ==  contrasenia:
-            return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)          
-        else:
             return JsonResponse({"message": "Credenciales incorrectas"}, status=401)
-   
-  
-    
-    # Create your views here.
-# @login_required
-# def index (req):
-#      return render(req, "index.html")
 
-# def salir(req):
-#     logout(req)
-#     return redirect('/') 
+        if usuario.contrasenia !=  contrasenia:
+            return JsonResponse({"message": "Credenciales incorrectas"}, status=401)
 
- 
+        respuesta = JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
+        respuesta.set_cookie('session_id', usuario.pk, max_age=3600)
+        respuesta.set_cookie('username', usuario.nombre, max_age=3600)
+        respuesta.set_cookie('email', usuario.email, max_age=3600)
+        return respuesta
+
+#Cerrar sesion -  borrar cookies
+def sign_out(request):
+    print('hola')
+    if request.method == 'POST':
+        request.session.clear()
+    else:
+        return redirect('/registrar/')
+
+

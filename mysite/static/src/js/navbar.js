@@ -8,4 +8,8 @@ function toggleDropdown() {
     } else {
         dropdown.classList.add("hidden");
     }
-}    
+};   
+
+function signOut() {
+    window.location.href = '/ingresar/';
+}
