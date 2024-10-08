@@ -53,7 +53,8 @@ def iniciar_conversacion(request):
     """
     Inicia una nueva conversación, recibiendo usuario_id en el cuerpo de la solicitud.
     """
-    usuario_id = request.data.get('usuario')
+    cookies = request.COOKIES
+    usuario_id = cookies.get('session_id')
 
     if not usuario_id:
         return Response({'error': 'usuario_id es requerido'}, status=status.HTTP_400_BAD_REQUEST)
@@ -105,11 +106,14 @@ def seleccionar_gestion(request):
     """
     Con la gestión seleccionada, iniciar el primer paso de la conversación y enviar opciones.
     """
+    cookies = request.COOKIES
+    usuario_id = cookies.get('session_id')
+    
     # conversacion_id = request.data.get('conversacion_id')
     
     gestion_id = request.data.get('gestion_id')
-    ultima_conversacion = Conversacion.objects.order_by('-fecha_inicio').first()
-    conversacion_abierta = Conversacion.objects.filter(conversacion_id=ultima_conversacion.conversacion_id, fecha_fin__isnull=True).first()
+    
+    conversacion_abierta = Conversacion.objects.filter(usuario_id=usuario_id, fecha_fin__isnull=True).first()
     conversacion_id = conversacion_abierta.conversacion_id
     if not conversacion_id or not gestion_id:
         return Response({'error': 'conversacion_id y gestion_id son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
