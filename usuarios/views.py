@@ -55,14 +55,14 @@ class AuthViewSet(viewsets.ViewSet):
         cookies = request.COOKIES
         session_id = cookies.get('session_id')
         if(session_id):
-            return redirect('/home/')
+            return redirect('/')
         return render(request, "registro.html")
     
     def login(self, request):
         cookies = request.COOKIES
         session_id = cookies.get('session_id')
         if(session_id):
-            return redirect('/home/')
+            return redirect('/')
         return render(request, "login.html")
     
     def auth(self, request):

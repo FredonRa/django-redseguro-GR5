@@ -9,7 +9,7 @@ router.register(r'usuarios', UsuarioViewSet, basename='usuarios')
 urlpatterns = [
     path('api/', include(router.urls)),
     path('registro/', AuthViewSet.as_view({'get': 'index'}), name='index'),
-    path('home/', AuthViewSet.as_view({'get': 'home'}), name='home'),
+    path('', AuthViewSet.as_view({'get': 'home'}), name='home'),
     path('ingresar/', AuthViewSet.as_view({'get': 'login'}), name='login'),
     path('auth/', AuthViewSet.as_view({'post': 'auth'}), name='auth'),
 ]
