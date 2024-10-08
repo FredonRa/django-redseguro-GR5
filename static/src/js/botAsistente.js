@@ -4,7 +4,9 @@ class BotUI {
     constructor() {
         this.conversacionActiva = false;
         this.listarConversacionesAnteriores = false;
-        this.chatContainer = document.getElementById('chatContainer');
+        this.containerChat = document.getElementById('container-chat');
+        this.containerMensajes = document.getElementById('container-mensajes');
+        this.notLoggedIn = document.getElementById('not-logged');
         this.mensajes = document.getElementById('mensajes');
         this.mensajesAnteriores = document.getElementById('mensajes-anteriores');
         this.verConversacionesAnterioresBtn = document.getElementById('ver-conversaciones-anteriores');
@@ -13,17 +15,35 @@ class BotUI {
         this.gestiones = [];
         this.conversacionesAnteriores = [];
         this.init();
+
+        // Crear un observer para observar cambios en el contenedor de mensajes
+        this.observer = new MutationObserver(() => {
+            this.scrollToBottom();
+        });
+
+        // Configurar el observer para observar hijos añadidos
+        this.observer.observe(this.mensajes, { childList: true });
     }
 
     async init() {
         try {
-            await this.loadBotData();
             this.setupEventListeners();
-            await this.loadPreviousConversations();
-            this.startConversation();
+
+            if (this.isLoggedIn()) {
+                await this.loadBotData();
+                await this.loadPreviousConversations();
+                this.startConversation();
+                this.containerMensajes.classList.remove("hidden")
+                this.notLoggedIn.classList.add("hidden")
+            }
         } catch (error) {
             console.error("Error during initialization:", error);
         }
+    }
+
+    isLoggedIn() {
+        const userInfoCookie = getCookie('session_id');
+        return userInfoCookie
     }
 
     async loadBotData() {
@@ -43,7 +63,7 @@ class BotUI {
 
     toggleChat(isVisible) {
         const action = isVisible ? 'remove' : 'add';
-        this.chatContainer.classList[action]('hidden');
+        this.containerChat.classList[action]('hidden');
         this.backdrop.classList[action]('hidden');
     }
 
@@ -110,7 +130,6 @@ class BotUI {
         container.appendChild(containerGestion);
 
         if (pasos) {
-
             for (const paso of pasos) {
                 await this.handlePaso(paso, conversacion_gestion_id, container);
             }
@@ -124,7 +143,6 @@ class BotUI {
 
         if (opcion) {
             const { nombre, respuestas } = opcion;
-            // this.createMessage(true);
             this.createUserMessage(container, nombre)
             if (respuestas) this.listRespuestas(respuestas, container);
         }
@@ -199,7 +217,6 @@ class BotUI {
         if (!this.conversacionActiva) return;
         const container = this.createElement('div', "flex flex-col gap-2");
         const options = this.createContinuationOptions();
-        // container.appendChild(options)
         this.createBotMessage(options, this.mensajes, "¿Desea realizar otra consulta?", false)
     }
 
@@ -240,7 +257,6 @@ class BotUI {
 
     async endConversation() {
         this.conversacionActiva = false; // Finaliza la conversación
-        // Aquí puedes añadir cualquier otra lógica necesaria al final de la conversación
     }
 
     createElement(tag, classes = '', text = '', id = '', onclick = null) {
@@ -263,7 +279,6 @@ class BotUI {
         const message = this.createElement('div', `p-2 flex rounded-lg w-fit ${isUser ? 'self-end bg-indigo-500 text-white' : 'bg-gray-200'}`, text);
         containerMessage.appendChild(message);
         container.appendChild(containerMessage);
-        this.scrollToBottom();
     }
 
     createBotMessage(content, container, labelText) {
@@ -292,8 +307,6 @@ class BotUI {
         } else {
             this.mensajes.appendChild(messageContainer);
         }
-        // Desplazarse hacia abajo automáticamente
-        this.scrollToBottom();
     }
 
     createUserMessage(container, text) {
@@ -321,12 +334,10 @@ class BotUI {
         } else {
             this.mensajes.appendChild(messageContainer);
         }
-        // Desplazarse hacia abajo automáticamente
-        this.scrollToBottom();
     }
 
     scrollToBottom() {
-        this.mensajes.scrollTop = this.mensajes.scrollHeight;
+        this.containerMensajes.scrollTop = this.mensajes.scrollHeight;
     }
 
     disableButtons(containerId) {
