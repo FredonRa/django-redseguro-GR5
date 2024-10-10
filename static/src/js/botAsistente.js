@@ -82,7 +82,6 @@ class BotUI {
         try {
             const conversacionesAnteriores = await BotService.getConversacionesAnteriores();
             if (conversacionesAnteriores.length) {
-                // this.verConversacionesAnterioresBtn
                 this.containerMensajesAnteriores.classList.remove("hidden");
                 this.conversacionesAnteriores = conversacionesAnteriores;
             }
