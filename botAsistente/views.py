@@ -20,8 +20,7 @@ from .utils import (
 
 class ConversacionView(APIView):
     def get(self, request, *args, **kwargs):
-        usuario_id = self.kwargs["usuario_id"]
-        return listar_conversaciones_anteriores(usuario_id)
+        return listar_conversaciones_anteriores(request)
     
     def post(self, request):
         return iniciar_conversacion(request)

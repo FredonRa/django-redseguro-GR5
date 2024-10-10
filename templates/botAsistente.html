@@ -1,0 +1,58 @@
+{% load static %}
+
+{% block javascript %}
+<script src="{% static 'src/js/services/BotService.js' %}"></script>
+<script src="{% static 'src/js/moment.js' %}"></script>
+<script src="{% static 'src/js/botAsistente.js' %}"></script>
+<script src="{% static 'src/js/lottie-player.js' %}"></script>
+{% endblock javascript %}
+
+<button id="chatButton" class="fixed bottom-4 right-2 ">
+    <lottie-player src="{% static 'src/json/bot.json' %}" background="transparent" speed="1"
+        style="width: 220px; height: 220px;" loop autoplay></lottie-player>
+</button>
+
+<div id="backdrop" class="fixed inset-0 bg-black opacity-50 hidden"></div>
+
+<!-- Contenedor del Chat Bot -->
+<div id="container-chat"
+    class="fixed  bg-white overflow-hidden rounded-lg shadow-lg w-8/12 flex flex-col hidden top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-5/6">
+    <div class="p-4 border-b">
+        <h2 class="text-xl font-bold text-center">Bot Asistente</h2>
+    </div>
+    <div id="not-logged" class="flex flex-1 w-full items-center justify-center bg-gray-100">
+        <div class="bg-white p-8 pt-0 rounded-lg text-center shadow-lg max-w-md">
+            <!-- Imagen tomada de undraw.co -->
+            <img class="w-full h-auto mb-6" src="{% static 'src/img/login.png' %}"
+                alt="Ilustración de inicio de sesión">
+
+            <!-- Texto -->
+            <h1 class="text-2xl font-semibold text-gray-800 mb-6 leading-relaxed">
+                Para utilizar el asistente primero debes ingresar
+            </h1>
+
+            <!-- Botón de Ingresar -->
+            <a href="/ingresar/"
+                class="bg-indigo-600 text-white text-lg font-medium px-6 py-3 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 ease-in-out">
+                Ingresar
+            </a>
+        </div>
+    </div>
+    <div id="container-mensajes" class="p-4 h-[calc(100%+61px)] overflow-y-auto flex flex-col hidden scroll-smooth">
+        <div id="container-mensajes-anteriores" class="flex flex-col py-2 hidden">
+            <div class="w-full flex justify-center pb-4 mb-2  border-b-2 border-gray-200"
+                id="ver-conversaciones-anteriores">
+                <button class="bg-indigo-600 py-2 px-3 rounded-lg text-white">Ver Conversaciones Anteriores</button>
+            </div>
+            <div id="mensajes-anteriores"></div>
+            <div class="hidden w-full py-5 border-t-2 border-gray-200 flex justify-center mt-10"
+                id="fecha-fin-container">
+                <span class="-mt-10 bg-indigo-300 py-2 px-3 rounded-lg" id="fecha-fin">Fin
+                    Conversaciones
+                    Anteriores</span>
+            </div>
+        </div>
+        <div id="mensajes"></div>
+        <!-- Mensajes se añadirán dinámicamente aquí -->
+    </div>
+</div>

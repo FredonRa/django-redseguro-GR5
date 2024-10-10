@@ -7,8 +7,8 @@ class _BotService {
         return await this.client.post('conversacion/iniciar/', data);
     }
 
-    async getConversacionesAnteriores(usuarioId) {
-        return await this.client.get(`conversacion/anteriores/${usuarioId}`);
+    async getConversacionesAnteriores() {
+        return await this.client.get(`conversacion/anteriores/`);
     }
 
     // Obtener todas las gestiones
