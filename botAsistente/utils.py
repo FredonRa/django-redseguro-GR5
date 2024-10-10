@@ -33,8 +33,11 @@ def conversacion_existente(conversacion_existente):
     conversacion_data['gestion'] = gestion_data
     return conversacion_data
 
-def listar_conversaciones_anteriores(usuario_id):
+def listar_conversaciones_anteriores(request):
     # Obtener las conversaciones anteriores del usuario 
+    cookies = request.COOKIES
+    usuario_id = cookies.get('session_id')
+    
     conversaciones_anteriores  = Conversacion.objects.filter(usuario=usuario_id, fecha_fin__isnull=False)
     
     # Lista para almacenar las conversaciones serializadas

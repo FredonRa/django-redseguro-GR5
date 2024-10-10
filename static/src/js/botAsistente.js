@@ -9,6 +9,7 @@ class BotUI {
         this.notLoggedIn = document.getElementById('not-logged');
         this.mensajes = document.getElementById('mensajes');
         this.mensajesAnteriores = document.getElementById('mensajes-anteriores');
+        this.containerMensajesAnteriores = document.getElementById('container-mensajes-anteriores');
         this.verConversacionesAnterioresBtn = document.getElementById('ver-conversaciones-anteriores');
         this.backdrop = document.getElementById('backdrop');
         this.opciones = [];
@@ -79,9 +80,10 @@ class BotUI {
 
     async loadPreviousConversations() {
         try {
-            const conversacionesAnteriores = await BotService.getConversacionesAnteriores(14);
+            const conversacionesAnteriores = await BotService.getConversacionesAnteriores();
             if (conversacionesAnteriores.length) {
-                this.verConversacionesAnterioresBtn.classList.remove("hidden");
+                // this.verConversacionesAnterioresBtn
+                this.containerMensajesAnteriores.classList.remove("hidden");
                 this.conversacionesAnteriores = conversacionesAnteriores;
             }
         } catch (error) {
