@@ -87,10 +87,22 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+"""
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',  # Nombre de la base de datos en Supabase
+        'USER': 'postgres.mfxhcfgqxgypsjdoemud',  # Usuario de Supabase
+        'PASSWORD': 'rBqMZJ3BlgPW8oyo',  # Contraseña de Supabase
+        'HOST': 'aws-0-us-west-1.pooler.supabase.com',  # Host de Supabase
+        'PORT': '6543',  # Puerto de Supabase
     }
 }
 
