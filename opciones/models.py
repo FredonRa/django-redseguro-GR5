@@ -10,3 +10,6 @@ class Opcion(models.Model):
     paso = models.ForeignKey(Paso, on_delete=models.CASCADE, blank=True, null=False, related_name='+', default=1)
     siguiente_paso = models.ForeignKey(Paso, on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
     nombre = models.CharField(null=False, max_length=50)
+    
+    def __str__(self):
+        return self.nombre
