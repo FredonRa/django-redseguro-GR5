@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Exists, OuterRef
 
 from conversaciones.models import Conversacion, Conversacion_Gestion, Conversacion_Paso, Conversacion_Opcion
-from usuarios.models import Usuario
+from django.contrib.auth.models import User
 from gestiones.models import Gestion
 from pasos.models import Paso
 from opciones.models import Opcion
@@ -64,8 +64,8 @@ def iniciar_conversacion(request):
 
     # Verificar si el usuario existe
     try:
-        usuario = Usuario.objects.get(usuario_id=usuario_id)
-    except Usuario.DoesNotExist:
+        usuario = User.objects.get(id=usuario_id)
+    except User.DoesNotExist:
         return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
     # Verificar si el usuario ya tiene una conversación activa (sin fecha_fin)
