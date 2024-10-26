@@ -8,3 +8,6 @@ class Paso(models.Model):
     nombre = models.CharField(null=False, max_length=50)
     orden = models.IntegerField(null=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre

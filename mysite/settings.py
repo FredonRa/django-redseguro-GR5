@@ -59,9 +59,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# REST_FRAMEWORK = {
-#     'EXCEPTION_HANDLER': 'myapp.exceptions.custom_exception_handler',
-# }
+REST_FRAMEWORK = {
+    # 'EXCEPTION_HANDLER': 'myapp.exceptions.custom_exception_handler',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+    ]
+}
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -143,7 +146,7 @@ COMPRESS_ENABLED = True
 
 COMPRESS_ROOT = BASE_DIR / 'static'
 
-STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+STATICFILES_FINDERS = ( 'django.contrib.staticfiles.finders.FileSystemFinder','django.contrib.staticfiles.finders.AppDirectoriesFinder','compressor.finders.CompressorFinder', )
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter']
 
@@ -153,13 +156,16 @@ COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Añade la ruta a tu carpeta 'static'
 ]
 
+ADMIN_MEDIA_PREFIX = '/static/admin/' 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# AUTH_USER_MODEL = 'usuarios.Usuario'

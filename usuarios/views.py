@@ -6,6 +6,8 @@ from .serializers import UsuarioSerializer
 from .exceptions import NombreError, ApellidoError, EmailError, ContraseniaError, EmailNotUniqueError
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -15,25 +17,32 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         try:
             # Lógica para validar los campos
             data = request.data
-            serializer = self.get_serializer(data=data)
+            first_name = data.get('nombre')
+            last_name = data.get('apellido')
+            password = data.get('contrasenia')
+            email = data.get('email')
             
-            if not data.get('nombre'):
+            if not first_name:
                 raise NombreError('El campo nombre es obligatorio.')
-            if not data.get('apellido'):
+            if not last_name:
                 raise ApellidoError('El campo apellido es obligatorio.')
-            if not data.get('email'):
+            if not email:
                 raise EmailError('El campo email es obligatorio.')
-            if Usuario.objects.filter(email=data.get('email')).exists():
+            if User.objects.filter(email=email).exists():
                 raise EmailNotUniqueError('El email ingresado ya está en uso.')
-            if not data.get('contrasenia') or len(data.get('contrasenia')) < 7:
+            if not password or len(password) < 7:
                 raise ContraseniaError('La contraseña debe tener al menos 7 caracteres.')
             
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer) 
+            User.objects.create_user(
+                username=email,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                password=password
+            )
             
             return Response({
                 'message': 'Usuario actualizado exitosamente.',
-                'data': serializer.data
             }, status=status.HTTP_200_OK)
              
         except NombreError as e:
@@ -68,16 +77,17 @@ class AuthViewSet(viewsets.ViewSet):
     def auth(self, request):
         email = request.data.get('email')
         contrasenia = request.data.get('contrasenia')
-        usuario = Usuario.objects.filter(email=email).first()
+        # usuario = Usuario.objects.filter(email=email).first()
+        usuario = authenticate(request, username=email, password=contrasenia)
+
 
         if usuario is None:
             return JsonResponse({"message": "Credenciales incorrectas"}, status=401)
 
-        if usuario.contrasenia !=  contrasenia:
-            return JsonResponse({"message": "Credenciales incorrectas"}, status=401)
+        login(request, usuario)
 
         respuesta = JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
         respuesta.set_cookie('session_id', usuario.pk, max_age=3600)
-        respuesta.set_cookie('username', usuario.nombre, max_age=3600)
+        respuesta.set_cookie('username', usuario.first_name, max_age=3600)
         respuesta.set_cookie('email', usuario.email, max_age=3600)
         return respuesta

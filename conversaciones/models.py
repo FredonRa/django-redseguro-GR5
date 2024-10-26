@@ -1,10 +1,11 @@
 from django.db import models
 from usuarios.models import Usuario
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Conversacion(models.Model):
     conversacion_id = models.AutoField(primary_key=True)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, blank=True, null=False, default=1)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=False, default=1)
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_fin = models.DateTimeField(null=True)
 
