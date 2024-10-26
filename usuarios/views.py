@@ -7,6 +7,7 @@ from .exceptions import NombreError, ApellidoError, EmailError, ContraseniaError
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -76,16 +77,17 @@ class AuthViewSet(viewsets.ViewSet):
     def auth(self, request):
         email = request.data.get('email')
         contrasenia = request.data.get('contrasenia')
-        usuario = Usuario.objects.filter(email=email).first()
+        # usuario = Usuario.objects.filter(email=email).first()
+        usuario = authenticate(request, username=email, password=contrasenia)
+
 
         if usuario is None:
             return JsonResponse({"message": "Credenciales incorrectas"}, status=401)
 
-        if usuario.contrasenia !=  contrasenia:
-            return JsonResponse({"message": "Credenciales incorrectas"}, status=401)
+        login(request, usuario)
 
         respuesta = JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
         respuesta.set_cookie('session_id', usuario.pk, max_age=3600)
-        respuesta.set_cookie('username', usuario.nombre, max_age=3600)
+        respuesta.set_cookie('username', usuario.first_name, max_age=3600)
         respuesta.set_cookie('email', usuario.email, max_age=3600)
         return respuesta
