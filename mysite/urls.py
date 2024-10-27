@@ -27,4 +27,5 @@ urlpatterns = [
     path('api/', include('respuestas.urls')),
     path('api/', include('botAsistente.urls')),
     path('backoffice/', include('backoffice.urls')),
+    path('', include('preguntasFrecuentes.urls')),
 ]

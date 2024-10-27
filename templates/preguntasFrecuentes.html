@@ -1,0 +1,18 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block javascript %}
+<script src="{% static 'src/js/services/PreguntasFrecuentesService.js' %}"></script>
+<script src="{% static 'src/js/preguntasFrecuentes.js' %}"></script>
+{% endblock javascript %}
+
+{% block content %}
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            Preguntas Frecuentes
+        </h2>
+    </div>
+    <div id="accordion" class="flex flex-col"></div>
+</div>
+{% endblock content %}
