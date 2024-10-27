@@ -16,9 +16,15 @@ module.exports = {
     "w-1/2",
     "mt-5",
     "self-center",
-    "h-12",
+    "w-4",
     "w-12",
-    "pt-2"
+    "h-4",
+    "h-12",
+    "pt-2",
+    "py-4",
+    "transition-transform",
+    "duration-300",
+    "rotate-180"
   ],
   theme: {
     extend: {},
