@@ -1,9 +1,12 @@
 from rest_framework import serializers
-from .models import Conversacion, Conversacion_Gestion, Conversacion_Opcion, Conversacion_Paso, Conversacion_Respuesta
+from .models import (Conversacion, Conversacion_Tipo_Gestion, Conversacion_Gestion, 
+                     Conversacion_Opcion, Conversacion_Paso, Conversacion_Respuesta)
 from respuestas.models import Respuesta
 from respuestas.serializers import RespuestaSerializer
 
 class ConversacionSerializer(serializers.ModelSerializer):
+    gestion = serializers.SerializerMethodField()
+
     class Meta:
         model = Conversacion
         fields = '__all__'
@@ -19,8 +22,30 @@ class ConversacionSerializer(serializers.ModelSerializer):
             return ConversacionGestionSerializer(gestion).data
         return None
 
+    # def get_tipo_gestion(self, obj):
+    #     # Obtener solo la primera gestión, ya que solo puede haber una gestión por conversación
+    #     tipo_gestion = Conversacion_Tipo_Gestion.objects.filter(conversacion=obj.conversacion_id).first()
+    #     if tipo_gestion:
+    #         return ConversacionTipoGestionSerializer(tipo_gestion).data
+    #     return None
+    
+class ConversacionTipoGestionSerializer(serializers.ModelSerializer):
+    nombre = serializers.CharField(source='tipo_gestion.nombre', read_only=True)
+    gestion = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Conversacion_Tipo_Gestion
+        fields = ['conversacion_tipo_gestion_id', 'nombre', 'conversacion', 'tipo_gestion_id', 'gestion']
+        
+    def get_gestion(self, obj):
+        try:
+            gestion = Conversacion_Gestion.objects.get(conversacion_id=obj.conversacion_id)
+            return ConversacionGestionSerializer(gestion).data
+        except Conversacion_Gestion.DoesNotExist:
+            return None
+
 class ConversacionGestionSerializer(serializers.ModelSerializer):
-    nombre = serializers.CharField(source='gestion.nombre', read_only=True)  # Añadir el nombre de la gestión
+    nombre = serializers.CharField(source='gestion.nombre', read_only=True)
     pasos = serializers.SerializerMethodField()
 
     class Meta:
@@ -39,13 +64,14 @@ class ConversacionPasoSerializer(serializers.ModelSerializer):
         fields = ['conversacion_paso_id', 'paso', 'opcion']
 
     def get_opcion(self, obj):
+        # Retorna la primera opción asociada al paso
         opcion = Conversacion_Opcion.objects.filter(conversacion_paso=obj).first()
-        if(opcion is None):
-            return None
-        return ConversacionOpcionSerializer(opcion).data
+        if opcion:
+            return ConversacionOpcionSerializer(opcion).data
+        return None
 
 class ConversacionOpcionSerializer(serializers.ModelSerializer):
-    nombre = serializers.CharField(source='opcion.nombre', read_only=True)  # Añadir el nombre de la opción
+    nombre = serializers.CharField(source='opcion.nombre', read_only=True)
     respuestas = serializers.SerializerMethodField()
 
     class Meta:
@@ -54,9 +80,9 @@ class ConversacionOpcionSerializer(serializers.ModelSerializer):
 
     def get_respuestas(self, obj):
         respuestas = Respuesta.objects.filter(opcion=obj.opcion)
-        if(respuestas.exists()):
+        if respuestas.exists():
             return RespuestaSerializer(respuestas, many=True).data
-        return None
+        return []
 
 class ConversacionRespuestaSerializer(serializers.ModelSerializer):
     class Meta:

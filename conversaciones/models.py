@@ -14,9 +14,12 @@ class Conversacion_Tipo_Gestion(models.Model):
     conversacion = models.ForeignKey('Conversacion', on_delete=models.CASCADE, related_name='+')
     tipo_gestion = models.ForeignKey('tipoGestiones.Tipo_Gestion', on_delete=models.CASCADE, related_name='+')
 
+    def __str__(self):
+        return f'{self.conversacion} - {self.tipo_gestion}'
+
 class Conversacion_Gestion(models.Model):
     conversacion_gestion_id = models.AutoField(primary_key=True)
-    conversacion_tipo_gestion = models.ForeignKey('Conversacion_Tipo_Gestion', on_delete=models.CASCADE, related_name='+')
+    conversacion = models.ForeignKey('Conversacion', on_delete=models.CASCADE, related_name='+', null=True)
     gestion = models.ForeignKey('gestiones.Gestion', on_delete=models.CASCADE, related_name='+')
     
 class Conversacion_Paso(models.Model):

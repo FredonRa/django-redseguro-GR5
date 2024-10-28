@@ -24,7 +24,8 @@ module.exports = {
     "py-4",
     "transition-transform",
     "duration-300",
-    "rotate-180"
+    "rotate-180",
+    "flex-wrap"
   ],
   theme: {
     extend: {},

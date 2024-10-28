@@ -11,9 +11,18 @@ class _BotService {
         return await this.client.get(`conversacion/anteriores/`);
     }
 
+    // Obtener todas los tipos de gestiones
+    async getTipoGestiones() {
+        return await this.client.get('tipoGestiones/');
+    }
+
+    async selectTipoGestiones(data) {
+        return await this.client.post('tipoGestiones/', data);
+    }
+
     // Obtener todas las gestiones
-    async getGestiones() {
-        return await this.client.get('gestiones/');
+    async getGestiones(tipo_gestion_id) {
+        return await this.client.get('gestiones/' + tipo_gestion_id);
     }
 
     async selectGestion(data) {
