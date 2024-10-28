@@ -8,10 +8,15 @@ class Conversacion(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=False, default=1)
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_fin = models.DateTimeField(null=True)
+    
+class Conversacion_Tipo_Gestion(models.Model):
+    conversacion_tipo_gestion_id = models.AutoField(primary_key=True)
+    conversacion = models.ForeignKey('Conversacion', on_delete=models.CASCADE, related_name='+')
+    tipo_gestion = models.ForeignKey('tipoGestiones.Tipo_Gestion', on_delete=models.CASCADE, related_name='+')
 
 class Conversacion_Gestion(models.Model):
     conversacion_gestion_id = models.AutoField(primary_key=True)
-    conversacion = models.ForeignKey('Conversacion', on_delete=models.CASCADE, related_name='+')
+    conversacion_tipo_gestion = models.ForeignKey('Conversacion_Tipo_Gestion', on_delete=models.CASCADE, related_name='+')
     gestion = models.ForeignKey('gestiones.Gestion', on_delete=models.CASCADE, related_name='+')
     
 class Conversacion_Paso(models.Model):
