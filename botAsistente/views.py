@@ -9,6 +9,8 @@ from conversaciones.models import Conversacion
 from .utils import (
     iniciar_conversacion,
     listar_conversaciones_anteriores,
+    listar_tipo_gestiones,
+    seleccionar_tipo_gestion,
     listar_gestiones,
     seleccionar_gestion,
     listar_opciones,
@@ -24,10 +26,20 @@ class ConversacionView(APIView):
     
     def post(self, request):
         return iniciar_conversacion(request)
+    
+class TipoGestionView(APIView):
+    def get(self, request):
+        return listar_tipo_gestiones()
+    
+    def post(self, request):
+        return seleccionar_tipo_gestion(request)
 
 class GestionView(APIView):
-    def get(self, request):
-        return listar_gestiones()
+    def get(self, request, tipo_gestion_id=None):
+        if tipo_gestion_id:
+            return listar_gestiones(tipo_gestion_id)
+        else:
+            return Response({"error": "El parámetro 'tipo_gestion_id' es requerido."}, status=400)
 
     def post(self, request):
         return seleccionar_gestion(request)

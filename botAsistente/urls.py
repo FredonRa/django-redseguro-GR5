@@ -1,12 +1,12 @@
 # path chat/urls.py
 from django.urls import path
-from .views import ConversacionView, GestionView, OpcionView, PasoView, RespuestaView, CerrarConversacion
+from .views import ConversacionView, TipoGestionView, GestionView, OpcionView, PasoView, RespuestaView, CerrarConversacion
 
 urlpatterns = [
      path('bot/conversacion/anteriores/', ConversacionView.as_view(), name='listar_conversaciones_anteriores'),
      path('bot/conversacion/iniciar/', ConversacionView.as_view(), name='iniciar_conversacion'),
-     # path('bot/conversacion/finalizar/', ConversacionView.as_view(), name='iniciar_conversacion'),
-     path('bot/gestiones/', GestionView.as_view(), name='listar_gestiones'),
+     path('bot/tipoGestiones/', TipoGestionView.as_view(), name='listar_tipo_gestiones'),
+     path('bot/gestiones/<int:tipo_gestion_id>', GestionView.as_view(), name='listar_gestiones'),
      path('bot/gestiones/seleccionar_gestion/', GestionView.as_view(), name='seleccionar_gestion'),
      path('bot/opciones/', OpcionView.as_view(), name='listar_opciones'),
      path('bot/opciones/seleccionar_opcion/', OpcionView.as_view(), name='seleccionar_opcion'),

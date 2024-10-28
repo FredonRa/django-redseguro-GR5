@@ -14,6 +14,7 @@ class BotUI {
         this.backdrop = document.getElementById('backdrop');
         this.opciones = [];
         this.gestiones = [];
+        this.tipoGestiones = [];
         this.conversacionesAnteriores = [];
         this.init();
 
@@ -48,12 +49,12 @@ class BotUI {
     }
 
     async loadBotData() {
-        const [opcionesData, gestionesData] = await Promise.all([
+        const [opcionesData, tipoGestionesData] = await Promise.all([
             BotService.getOpciones(),
-            BotService.getGestiones()
+            BotService.getTipoGestiones()
         ]);
         this.opciones = opcionesData.opciones;
-        this.gestiones = gestionesData.gestiones;
+        this.tipoGestiones = tipoGestionesData.tipo_gestiones;
     }
 
     setupEventListeners() {
@@ -71,8 +72,9 @@ class BotUI {
     async startConversation() {
         try {
             this.conversacionActiva = true;
-            const { gestion } = await BotService.start({ usuario: 14 });
-            gestion ? this.listConversation(gestion) : this.listGestiones(this.gestiones);
+            const { tipo_gestion } = await BotService.start({ usuario: 14 });
+            await this.listTipoGestiones(this.tipoGestiones);
+            if (tipo_gestion) this.listConversation(tipo_gestion)
         } catch (error) {
             console.error("Error starting conversation:", error);
         }
@@ -113,28 +115,40 @@ class BotUI {
     }
 
     async displayPreviousConversation(conversacion) {
+        const { tipo_gestion } = conversacion;
+        if (!tipo_gestion) return;
+
+        await this.listTipoGestiones(this.tipoGestiones, this.mensajesAnteriores);
+
         const fechaInicio = this.createFechaInicio(conversacion.fecha_inicio);
         const containerConversacion = this.createElement('div');
-        this.mensajesAnteriores.appendChild(containerConversacion)
         containerConversacion.appendChild(fechaInicio);
-        await this.listConversation(conversacion.gestion, containerConversacion);
+        await this.listConversation(conversacion.tipo_gestion, containerConversacion);
+        this.mensajesAnteriores.appendChild(containerConversacion)
     }
 
-    async listConversation(gestion, container = this.mensajes) {
-        if (!gestion) return;
+    async listConversation(tipo_gestion, container = this.mensajes) {
+        if (!tipo_gestion) return;
 
-        const { conversacion_gestion_id, nombre, pasos } = gestion;
+        const { nombre: nombreTipoGestion, tipo_gestion_id, gestion } = tipo_gestion;
         const containerGestion = this.createElement('div');
-        await this.listGestiones(this.gestiones, container);
-
-        this.createUserMessage(containerGestion, nombre, true)
+        this.createUserMessage(containerGestion, nombreTipoGestion, true)
         container.appendChild(containerGestion);
 
-        if (pasos) {
-            for (const paso of pasos) {
-                await this.handlePaso(paso, conversacion_gestion_id, container);
+        const { gestiones } = await BotService.getGestiones(tipo_gestion_id)
+
+        await this.listGestiones(gestiones, container);
+
+        if (gestion) {
+            this.createUserMessage(container, gestion.nombre, true)
+
+            if (gestion.pasos) {
+                for (const paso of gestion.pasos) {
+                    await this.handlePaso(paso, gestion.conversacion_gestion_id, container);
+                }
             }
         }
+
     }
 
     async handlePaso(paso, conversacion_gestion_id, container) {
@@ -149,15 +163,39 @@ class BotUI {
         }
     }
 
+    async listTipoGestiones(tipoGestiones, container = this.mensajes) {
+        const containerGestiones = this.createElement('div', "flex flex-col gap-2");
+        const gestionesDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-wrap");
+
+        tipoGestiones.forEach(({ tipo_gestion_id, nombre }) => {
+            this.createButton(gestionesDiv, tipo_gestion_id, nombre, () => this.handleTipoGestionSelection(tipo_gestion_id, nombre));
+        });
+
+        this.createBotMessage(gestionesDiv, containerGestiones, "Para comenzar, seleccione un tipo de gestión:");
+        container.appendChild(containerGestiones);
+        this.disableButtons(container.id, container.id)
+    }
+
+    async handleTipoGestionSelection(tipo_gestion_id, nombre) {
+        try {
+            const { gestiones } = await BotService.selectTipoGestiones({ tipo_gestion_id: tipo_gestion_id });
+            this.createUserMessage(this.mensajes, nombre);
+            this.disableButtons(this.mensajes.id);
+            await this.listGestiones(gestiones);
+        } catch (error) {
+            console.error("Error selecting gestion:", error);
+        }
+    }
+
     async listGestiones(gestiones, container = this.mensajes) {
         const containerGestiones = this.createElement('div', "flex flex-col gap-2");
-        const gestionesDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-col");
+        const gestionesDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-wrap");
 
         gestiones.forEach(({ gestion_id, nombre }) => {
             this.createButton(gestionesDiv, gestion_id, nombre, () => this.handleGestionSelection(gestion_id, nombre));
         });
 
-        this.createBotMessage(gestionesDiv, containerGestiones, "Para comenzar, seleccione una gestión:");
+        this.createBotMessage(gestionesDiv, containerGestiones, "Genial, ahora seleccione una gestión:");
         container.appendChild(containerGestiones);
     }
 
@@ -174,7 +212,7 @@ class BotUI {
 
     async listOpciones(opciones, conversacion_gestion_id, container = this.mensajes) {
         const containerOpciones = this.createElement('div', "flex flex-col gap-2");
-        const opcionesDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-col");
+        const opcionesDiv = this.createElement('div', "mb-2 w-full gap-2 flex flex-wrap");
 
         opciones.forEach(({ opcion_id, nombre, paso }) => {
             this.createButton(opcionesDiv, opcion_id, nombre, async () => {

@@ -4,33 +4,37 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import Exists, OuterRef
 
-from conversaciones.models import Conversacion, Conversacion_Gestion, Conversacion_Paso, Conversacion_Opcion
+from conversaciones.models import Conversacion, Conversacion_Tipo_Gestion, Conversacion_Gestion, Conversacion_Paso, Conversacion_Opcion
 from django.contrib.auth.models import User
 from gestiones.models import Gestion
 from pasos.models import Paso
 from opciones.models import Opcion
 from respuestas.models import Respuesta
+from tipoGestiones.models import Tipo_Gestion
 
-from conversaciones.serializers import ConversacionSerializer, ConversacionGestionSerializer
+from conversaciones.serializers import ConversacionSerializer, ConversacionTipoGestionSerializer, ConversacionGestionSerializer
 from gestiones.serializers import GestionSerializer
 from opciones.serializers import OpcionSerializer
 from respuestas.serializers import RespuestaSerializer
+from tipoGestiones.serializers import TipoGestionesSerializer 
 
 def conversacion_existente(conversacion_existente):
     # Serializar la conversación principal
     conversacion_data = ConversacionSerializer(conversacion_existente).data
     
     # Obtener la gestión relacionada a la conversación (solo una)
-    gestion = Conversacion_Gestion.objects.filter(conversacion=conversacion_existente.conversacion_id).first()
+    
+    # gestion = Conversacion_Gestion.objects.filter(conversacion=conversacion_existente.conversacion_id).first()
+    tipo_gestiones = Conversacion_Tipo_Gestion.objects.filter(conversacion_id=conversacion_existente.conversacion_id).first()
     
     # Si hay una gestión, serializarla; si no, devolver None
-    if gestion:
-        gestion_data = ConversacionGestionSerializer(gestion).data
+    if tipo_gestiones:
+        tipo_gestion_data = ConversacionTipoGestionSerializer(tipo_gestiones).data
     else:
-        gestion_data = None
+        tipo_gestion_data = None
 
     # Agregar la gestión a la respuesta
-    conversacion_data['gestion'] = gestion_data
+    conversacion_data['tipo_gestion'] = tipo_gestion_data
     return conversacion_data
 
 def listar_conversaciones_anteriores(request):
@@ -83,9 +87,39 @@ def iniciar_conversacion(request):
         'usuario_id': usuario_id
     }, status=status.HTTP_201_CREATED)
 
-def listar_gestiones():
+    
+def listar_tipo_gestiones():
+    """
+    Retorna todos los objetos creados en TipoGestion.
+    """
+    tipo_gestiones = Tipo_Gestion.objects.all()
+    tipo_gestiones_serializadas = TipoGestionesSerializer(tipo_gestiones, many=True).data
+    return Response({'tipo_gestiones': tipo_gestiones_serializadas}, status=status.HTTP_200_OK)
+
+def seleccionar_tipo_gestion(request):
+    tipo_gestion_id = request.data.get('tipo_gestion_id')
+    
+    cookies = request.COOKIES
+    usuario_id = cookies.get('session_id')
+    
+    conversacion_abierta = Conversacion.objects.filter(usuario_id=usuario_id, fecha_fin__isnull=True).first()
+    conversacion_id = conversacion_abierta.conversacion_id
+    conversacion = get_object_or_404(Conversacion, conversacion_id=conversacion_id)
+
+    tipo_gestion = get_object_or_404(Tipo_Gestion, tipo_gestion_id=tipo_gestion_id)
+
+    # Aquí ajustamos el nombre del campo
+    Conversacion_Tipo_Gestion.objects.create(
+        conversacion_id=conversacion_abierta.conversacion_id,
+        tipo_gestion=tipo_gestion
+    )
+    
+    return listar_gestiones(tipo_gestion_id)
+
+def listar_gestiones(tipo_gestion_id=None):
     """
     Envía las gestiones disponibles que tienen opciones con al menos una respuesta.
+    Filtra por tipoGestion si se proporciona el id.
     """
     gestiones = Gestion.objects.filter(
         Exists(
@@ -100,6 +134,9 @@ def listar_gestiones():
             )
         )
     )
+    
+    if tipo_gestion_id is not None:
+        gestiones = gestiones.filter(tipo_gestion_id=tipo_gestion_id)
 
     gestiones_serializadas = GestionSerializer(gestiones, many=True).data
 
@@ -111,8 +148,6 @@ def seleccionar_gestion(request):
     """
     cookies = request.COOKIES
     usuario_id = cookies.get('session_id')
-    
-    # conversacion_id = request.data.get('conversacion_id')
     
     gestion_id = request.data.get('gestion_id')
     

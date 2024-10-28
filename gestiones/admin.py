@@ -3,7 +3,7 @@ from .models import Gestion
 
 # Register your models here.
 class GestionAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'descripcion'] 
+    list_display = ['nombre', 'descripcion', 'tipo_gestion'] 
     pass
 
 admin.site.register(Gestion, GestionAdmin)

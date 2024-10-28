@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'respuestas',
     'botAsistente',
     'backoffice',
-    'preguntasFrecuentes'
+    'preguntasFrecuentes',
+    'tipoGestiones'
 ]
 
 MIDDLEWARE = [
