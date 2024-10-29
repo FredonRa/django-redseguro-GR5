@@ -125,6 +125,7 @@ class BotUI {
         containerConversacion.appendChild(fechaInicio);
         await this.listConversation(conversacion.tipo_gestion, containerConversacion);
         this.mensajesAnteriores.appendChild(containerConversacion)
+        this.disableButtons(this.mensajesAnteriores.id)
     }
 
     async listConversation(tipo_gestion, container = this.mensajes) {
@@ -173,7 +174,6 @@ class BotUI {
 
         this.createBotMessage(gestionesDiv, containerGestiones, "Para comenzar, seleccione un tipo de gestión:");
         container.appendChild(containerGestiones);
-        this.disableButtons(container.id, container.id)
     }
 
     async handleTipoGestionSelection(tipo_gestion_id, nombre) {
