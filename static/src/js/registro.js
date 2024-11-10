@@ -24,6 +24,7 @@ const submit = async (usuario) => {
     await UsuarioService.createUsuario(usuario)
         .then(data => {
             showAlert("success", "Usuario registrado correctamente.")
+            window.location.href = "/ingresar/"
             return data
         })
         .catch(err => {
