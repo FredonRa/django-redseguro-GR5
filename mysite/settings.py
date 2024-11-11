@@ -68,6 +68,7 @@ REST_FRAMEWORK = {
     ]
 }
 
+
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [

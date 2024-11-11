@@ -74,6 +74,13 @@ class AuthViewSet(viewsets.ViewSet):
             return redirect('/')
         return render(request, "login.html")
     
+    def actualizarDatos(self, request):
+        cookies = request.COOKIES
+        session_id = cookies.get('session_id')
+        if(session_id):
+            return redirect('/')
+        return render(request, "actualizarDatos.html")
+    
     def auth(self, request):
         email = request.data.get('email')
         contrasenia = request.data.get('contrasenia')
