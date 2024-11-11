@@ -42,6 +42,7 @@ function logout() {
 }
 
 function actualizarDatos() {
+
     // Redirigir a la página de actualización de datos
     window.location.href = "/actualizarDatos/";
 }

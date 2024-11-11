@@ -9,6 +9,8 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 
+
+
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
@@ -74,12 +76,17 @@ class AuthViewSet(viewsets.ViewSet):
             return redirect('/')
         return render(request, "login.html")
     
-    def actualizarDatos(self, request):
-        cookies = request.COOKIES
-        session_id = cookies.get('session_id')
-        if(session_id):
-            return redirect('/')
-        return render(request, "actualizarDatos.html")
+    #@login_required 
+    def actualizarDatos(self,request):
+        # Renderizar la página con los datos del usuario
+        return render(request, "ActualizarDatos.html", {
+        'username':request.COOKIES.get('username'),
+        'lastname':request.COOKIES.get('lastname'),
+        'email':request.COOKIES.get('email'),
+        'contrasenia':request.COOKIES.get('contrasenia'),
+        
+
+    })
     
     def auth(self, request):
         email = request.data.get('email')
@@ -96,5 +103,6 @@ class AuthViewSet(viewsets.ViewSet):
         respuesta = JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
         respuesta.set_cookie('session_id', usuario.pk, max_age=3600)
         respuesta.set_cookie('username', usuario.first_name, max_age=3600)
+        respuesta.set_cookie('lastname', usuario.last_name, max_age=3600)
         respuesta.set_cookie('email', usuario.email, max_age=3600)
         return respuesta
