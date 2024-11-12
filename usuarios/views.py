@@ -62,7 +62,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         try:
             # Obtener el email del usuario desde los datos del request
             email = request.data.get('email')
-            
+
             if not email:
                 raise EmailError('El campo email es obligatorio.')
 
@@ -70,17 +70,16 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             user = User.objects.get(email=email)
 
             # Obtener los otros datos del request
-            first_name = request.data.get('first_name')
-            last_name = request.data.get('last_name')
+            first_name = request.data.get('nombre')
+            last_name = request.data.get('apellido')
+            print (first_name)
 
             # Validaciones de campos obligatorios
             if not first_name:
                 raise NombreError('El campo nombre es obligatorio.')
             if not last_name:
                 raise ApellidoError('El campo apellido es obligatorio.')
-            if not email:
-                raise EmailError('El campo email es obligatorio.')
-
+            
             # Verificar que el email no esté en uso por otro usuario
             if User.objects.filter(email=email).exclude(id=user.id).exists():
                 raise EmailNotUniqueError('El email ingresado ya está en uso.')
@@ -88,12 +87,19 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             # Actualizar los campos del usuario
             user.first_name = first_name
             user.last_name = last_name
+            
             user.save()  # Guardar los cambios en la base de datos
 
-            return Response({
+            response =  Response({
                 'message': 'Usuario actualizado exitosamente.',
             }, status=status.HTTP_200_OK)
+        
+             # Actualizar las cookies
+            response.set_cookie('username', user.first_name, max_age=3600)
+            response.set_cookie('lastname', user.last_name, max_age=3600)
              
+            return response 
+
         except NombreError as e:
             return Response({'message': str(e)}, status=e.status_code)
         except ApellidoError as e:

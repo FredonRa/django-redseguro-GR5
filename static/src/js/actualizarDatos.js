@@ -25,7 +25,7 @@ const submit  = async (usuario) => {
     await UsuarioService.updateUsuario(usuarioId,usuario)
         .then(data => {
             showAlert("success", "Usuario actualizado correctamente.")
-            window.location.href = "#"
+            window.location.href = "/ingresar"
             return data
         })
         .catch(err => {
