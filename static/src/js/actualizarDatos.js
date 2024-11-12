@@ -21,7 +21,8 @@ window.addEventListener('DOMContentLoaded', async function () {
 })
 
 const submit  = async (usuario) => {
-    await UsuarioService.updateUsuario(usuario)
+    const usuarioId = usuario.id; 
+    await UsuarioService.updateUsuario(usuarioId,usuario)
         .then(data => {
             showAlert("success", "Usuario actualizado correctamente.")
             window.location.href = "#"
@@ -29,6 +30,7 @@ const submit  = async (usuario) => {
         })
         .catch(err => {
             console.error(err)
+            
         });
 }
 

@@ -60,35 +60,36 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         
     def update(self, request, *args, **kwargs):
         try:
-            # Obtener el email desde los datos enviados
-            print(request.data.get('email'))
+            # Obtener el email del usuario desde los datos del request
+            email = request.data.get('email')
             
-            email = request.COOKIES.get('email')
-            
-            # Verificar si el email existe en la base de datos
-            instance = User.objects.filter(email=email).first()
-            
-            if not instance:
-                raise EmailError('El email ingresado no está registrado.')
-  
-          # Lógica para validar los campos
-            first_name = request.data.get('nombre')
-            last_name = request.data.get('apellido')
-            
+            if not email:
+                raise EmailError('El campo email es obligatorio.')
+
+            # Buscar el usuario por su email
+            user = User.objects.get(email=email)
+
+            # Obtener los otros datos del request
+            first_name = request.data.get('first_name')
+            last_name = request.data.get('last_name')
+
+            # Validaciones de campos obligatorios
             if not first_name:
                 raise NombreError('El campo nombre es obligatorio.')
             if not last_name:
                 raise ApellidoError('El campo apellido es obligatorio.')
-         
+            if not email:
+                raise EmailError('El campo email es obligatorio.')
+
             # Verificar que el email no esté en uso por otro usuario
-            if User.objects.filter(email=email).exclude(id=instance.id).exists():
+            if User.objects.filter(email=email).exclude(id=user.id).exists():
                 raise EmailNotUniqueError('El email ingresado ya está en uso.')
-            
-           # Actualizar los campos del usuario
-            instance.first_name = first_name
-            instance.last_name = last_name
-            instance.save()  # Guardar los cambios en la base de datos
-            
+
+            # Actualizar los campos del usuario
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()  # Guardar los cambios en la base de datos
+
             return Response({
                 'message': 'Usuario actualizado exitosamente.',
             }, status=status.HTTP_200_OK)
@@ -100,10 +101,10 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         except EmailError as e:
             return Response({'message': str(e)}, status=e.status_code)
         except Exception as e:
-             return Response({
+            return Response ({
                 'message': 'Ocurrió un problema con el servidor, vuelva a intentar en unos minutos.',
-                'details': str(e),       
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class AuthViewSet(viewsets.ViewSet):
     def home(self, request):
