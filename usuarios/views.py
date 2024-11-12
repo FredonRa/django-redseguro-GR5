@@ -57,7 +57,54 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             return Response({'message': str(e)}, status=e.status_code)
         except Exception as e:
             return Response({'message': 'Ocurrió un problema con el servidor, vuelva a intentar en unos minutos.', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            # Obtener el email desde los datos enviados
+            print(request.data.get('email'))
+            
+            email = request.COOKIES.get('email')
+            
+            # Verificar si el email existe en la base de datos
+            instance = User.objects.filter(email=email).first()
+            
+            if not instance:
+                raise EmailError('El email ingresado no está registrado.')
+  
+          # Lógica para validar los campos
+            first_name = request.data.get('nombre')
+            last_name = request.data.get('apellido')
+            
+            if not first_name:
+                raise NombreError('El campo nombre es obligatorio.')
+            if not last_name:
+                raise ApellidoError('El campo apellido es obligatorio.')
+         
+            # Verificar que el email no esté en uso por otro usuario
+            if User.objects.filter(email=email).exclude(id=instance.id).exists():
+                raise EmailNotUniqueError('El email ingresado ya está en uso.')
+            
+           # Actualizar los campos del usuario
+            instance.first_name = first_name
+            instance.last_name = last_name
+            instance.save()  # Guardar los cambios en la base de datos
+            
+            return Response({
+                'message': 'Usuario actualizado exitosamente.',
+            }, status=status.HTTP_200_OK)
+             
+        except NombreError as e:
+            return Response({'message': str(e)}, status=e.status_code)
+        except ApellidoError as e:
+            return Response({'message': str(e)}, status=e.status_code)
+        except EmailError as e:
+            return Response({'message': str(e)}, status=e.status_code)
+        except Exception as e:
+             return Response({
+                'message': 'Ocurrió un problema con el servidor, vuelva a intentar en unos minutos.',
+                'details': str(e),       
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        
 class AuthViewSet(viewsets.ViewSet):
     def home(self, request):
         return render(request, "home.html")
@@ -82,10 +129,7 @@ class AuthViewSet(viewsets.ViewSet):
         return render(request, "ActualizarDatos.html", {
         'username':request.COOKIES.get('username'),
         'lastname':request.COOKIES.get('lastname'),
-        'email':request.COOKIES.get('email'),
-        'contrasenia':request.COOKIES.get('contrasenia'),
-        
-
+        'email':request.COOKIES.get('email'), 
     })
     
     def auth(self, request):
