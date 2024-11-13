@@ -12,7 +12,7 @@ urlpatterns = [
     path('registro/', AuthViewSet.as_view({'get': 'index'}), name='index'),
     path('', AuthViewSet.as_view({'get': 'home'}), name='home'),
     path('actualizarDatos/', AuthViewSet.as_view({'get': 'actualizarDatos'}), name='actualizarDatos'),
-    path('modificarContrasenia/', AuthViewSet.as_view({'get': 'modificarContrasenia'}), name='modificarContrasenia'),
+    path('modificarContrasenia/', AuthViewSet.as_view({'get': 'updatePassword'}), name='modificarContrasenia'),
     path('ingresar/', AuthViewSet.as_view({'get': 'login'}), name='login'),
     path('auth/', AuthViewSet.as_view({'post': 'auth'}), name='auth'),
 ]

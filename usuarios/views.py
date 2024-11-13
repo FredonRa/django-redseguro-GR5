@@ -63,7 +63,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         try:
             # Obtener el email del usuario desde los datos del request
             email = request.data.get('email')
-            print ('sarasa1')
+            print('HOLAqqqq')
 
             if not email:
                 raise EmailError('El campo email es obligatorio.')
@@ -113,30 +113,24 @@ class UsuarioViewSet(viewsets.ModelViewSet):
                 'details': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    @action(detail=False, methods=['post'], url_path='updatePassword')       
-    def updatePassword(self, request, *args, **kwargs):
-        try:
-          
-            # Obtener el usuario autenticado (de la sesión o token)
+
+    @action(detail=False, methods=['post'])   
+    def updatePassword(self, request):
+            # Extraer nueva contraseña del request
+            nueva_contrasenia = request.data.get('nueva_contrasenia')
+            print('2123as')
+            # Verificar si la nueva contraseña está presente
+            if not nueva_contrasenia:
+                return Response({'error': 'Faltan datos'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Obtener el usuario logueado desde la sesión
             user = request.user
-            print ('sarasaaaa')
-            if not user.is_authenticated:
-                raise ValidationError("Usuario no autenticado.")
-            
-            # Obtener la nueva contraseña desde el cuerpo de la solicitud
-            new_password = request.data.get('contrasenia')
 
-            if not new_password:
-                raise ValidationError("La nueva contraseña es obligatoria.")
-
-            # Cambiar la contraseña
-            user.set_password(new_password)
+            # Actualizar la contraseña
+            user.set_password(nueva_contrasenia)  # Se usa set_password para asegurar que se encripte la contraseña
             user.save()
 
-            return Response({"message": "Contraseña actualizada correctamente."}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({"message": "Ocurrió un error", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': 'Contraseña actualizada correctamente'}, status=status.HTTP_200_OK)
 
 class AuthViewSet(viewsets.ViewSet):
     def home(self, request):
@@ -164,7 +158,7 @@ class AuthViewSet(viewsets.ViewSet):
         'lastname':request.COOKIES.get('lastname'),
         'email':request.COOKIES.get('email'), 
     })
-
+    
     def modificarContrasenia(self,request):
         # Renderizar la página con los datos del usuario
         return render(request, "modificarContrasenia.html")

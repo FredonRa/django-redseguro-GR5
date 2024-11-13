@@ -21,8 +21,17 @@ class _UsuarioService {
     }
 
     // Actualizar un contraseña
-    async updatePassword(data) {
-        return await this.client.post(``, data);
+    async updatePassword(nueva_contrasenia) {
+        try {
+            const response = await this.client.post('update-password/', {
+                nueva_contrasenia: nueva_contrasenia
+            });
+            console.log('Contraseña actualizada correctamente:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error al actualizar la contraseña:', error);
+            throw error;  // Lanza el error para ser capturado donde se llame a esta función
+        }
     }
 
     // Eliminar un usuario

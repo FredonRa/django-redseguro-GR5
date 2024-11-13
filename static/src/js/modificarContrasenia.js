@@ -12,24 +12,24 @@ window.addEventListener('DOMContentLoaded', async function () {
 
         if (
             !errors.email.error &&
-            !errors.contrasenia.error
+            !errors.nueva_contrasenia.error
         ) {
             submit(usuario)
         }
     });
 })
 
-const submit  = async (usuario) => {
-    await UsuarioService.updatePassword(usuario)
-        .then(data => {
-            showAlert("success", "Usuario actualizado correctamente.")
-            window.location.href = "/ingresar"
-            return data
-        })
-        .catch(err => {
-            console.error(err)
-            
-        });
+const submit = async () => {
+    const nueva_contrasenia = document.getElementById('nueva_contrasenia').value;  // Obtener la nueva contraseña desde el input
+
+    try {
+        const data = await UsuarioService.updatePassword(nueva_contrasenia);
+        showAlert("success", "Contraseña actualizada correctamente.");
+        window.location.href = "/ingresar/";  // Redirigir al login o a donde corresponda
+    } catch (err) {
+        console.error(err);
+        showAlert("error", "Hubo un error al actualizar la contraseña.");
+    }
 }
 
 function showError(input, errorInputId) {
@@ -52,21 +52,21 @@ function resetErrors() {
 
 const getFormData = (formData) => {
     const email = formData.get('email');
-    const contrasenia = formData.get('contrasenia');
-    return {email, contrasenia }
+    const nueva_contrasenia = formData.get('nueva_contrasenia');
+    return {email, nueva_contrasenia }
 }
 
 const validateFormData = (formData) => {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
     // Obtener los valores de los campos
-    const {email, contrasenia } = getFormData(formData);
+    const {email, nueva_contrasenia } = getFormData(formData);
 
     const errors = {
         email: {
             error: false,
         },
-        contrasenia: {
+        nueva_contrasenia: {
             error: false,
         },
     };
