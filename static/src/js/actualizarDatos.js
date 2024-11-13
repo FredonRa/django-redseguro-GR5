@@ -13,7 +13,6 @@ window.addEventListener('DOMContentLoaded', async function () {
         if (!errors.nombre.error &&
             !errors.apellido.error &&
             !errors.email.error
-         //   !errors.contrasenia.error
         ) {
             submit(usuario)
         }
@@ -56,7 +55,6 @@ const getFormData = (formData) => {
     const nombre = formData.get('nombre');
     const apellido = formData.get('apellido');
     const email = formData.get('email');
-    //const contrasenia = formData.get('contrasenia');
     return { nombre, apellido, email}
 }
 
@@ -76,9 +74,6 @@ const validateFormData = (formData) => {
         email: {
             error: false,
         },
-       // contrasenia: {
-        //    error: false,
-       // },
     };
 
     resetErrors();
@@ -100,12 +95,5 @@ const validateFormData = (formData) => {
         errors.email.error = true;
         showError("email", 'email-text-error');
     }
-
-    // Validar contraseña (ejemplo: al menos 6 caracteres)
-  //  if (!contrasenia.trim() || contrasenia.length < 6) {
-   //     errors.contrasenia.error = true;
-  //      showError("contrasenia", 'contrasenia-text-error');
-   // }
-
     return errors;
 }

@@ -20,6 +20,11 @@ class _UsuarioService {
         return await this.client.put(`${usuarioId}/`, data);
     }
 
+    // Actualizar un contraseña
+    async updatePassword(data) {
+        return await this.client.post(``, data);
+    }
+
     // Eliminar un usuario
     async deleteUsuario(usuarioId) {
         return await this.client.delete(`${usuarioId}/`);

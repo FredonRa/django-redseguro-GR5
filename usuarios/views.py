@@ -8,7 +8,8 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
-
+from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import action
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -62,6 +63,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         try:
             # Obtener el email del usuario desde los datos del request
             email = request.data.get('email')
+            print ('sarasa1')
 
             if not email:
                 raise EmailError('El campo email es obligatorio.')
@@ -72,7 +74,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             # Obtener los otros datos del request
             first_name = request.data.get('nombre')
             last_name = request.data.get('apellido')
-            print (first_name)
 
             # Validaciones de campos obligatorios
             if not first_name:
@@ -112,6 +113,31 @@ class UsuarioViewSet(viewsets.ModelViewSet):
                 'details': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    @action(detail=False, methods=['post'], url_path='updatePassword')       
+    def updatePassword(self, request, *args, **kwargs):
+        try:
+          
+            # Obtener el usuario autenticado (de la sesión o token)
+            user = request.user
+            print ('sarasaaaa')
+            if not user.is_authenticated:
+                raise ValidationError("Usuario no autenticado.")
+            
+            # Obtener la nueva contraseña desde el cuerpo de la solicitud
+            new_password = request.data.get('contrasenia')
+
+            if not new_password:
+                raise ValidationError("La nueva contraseña es obligatoria.")
+
+            # Cambiar la contraseña
+            user.set_password(new_password)
+            user.save()
+
+            return Response({"message": "Contraseña actualizada correctamente."}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"message": "Ocurrió un error", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class AuthViewSet(viewsets.ViewSet):
     def home(self, request):
         return render(request, "home.html")
@@ -130,7 +156,7 @@ class AuthViewSet(viewsets.ViewSet):
             return redirect('/')
         return render(request, "login.html")
     
-    #@login_required 
+
     def actualizarDatos(self,request):
         # Renderizar la página con los datos del usuario
         return render(request, "ActualizarDatos.html", {

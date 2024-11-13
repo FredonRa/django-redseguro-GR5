@@ -10,10 +10,9 @@ window.addEventListener('DOMContentLoaded', async function () {
         const errors = validateFormData(formData);
         const usuario = getFormData(formData);
 
-        if (!errors.nombre.error &&
-            !errors.apellido.error &&
-            !errors.email.error
-         //   !errors.contrasenia.error
+        if (
+            !errors.email.error &&
+            !errors.contrasenia.error
         ) {
             submit(usuario)
         }
@@ -21,8 +20,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 })
 
 const submit  = async (usuario) => {
-    const usuarioId = usuario.id; 
-    await UsuarioService.updateUsuario(usuarioId,usuario)
+    await UsuarioService.updatePassword(usuario)
         .then(data => {
             showAlert("success", "Usuario actualizado correctamente.")
             window.location.href = "/ingresar"
@@ -53,59 +51,37 @@ function resetErrors() {
 }
 
 const getFormData = (formData) => {
-    const nombre = formData.get('nombre');
-    const apellido = formData.get('apellido');
     const email = formData.get('email');
-    //const contrasenia = formData.get('contrasenia');
-    return { nombre, apellido, email}
+    const contrasenia = formData.get('contrasenia');
+    return {email, contrasenia }
 }
 
 const validateFormData = (formData) => {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
     // Obtener los valores de los campos
-    const { nombre, apellido, email } = getFormData(formData);
+    const {email, contrasenia } = getFormData(formData);
 
     const errors = {
-        nombre: {
-            error: false,
-        },
-        apellido: {
-            error: false,
-        },
         email: {
             error: false,
         },
-       // contrasenia: {
-        //    error: false,
-       // },
+        contrasenia: {
+            error: false,
+        },
     };
 
     resetErrors();
 
 
-    // Validar que los campos no estén vacíos
-    if (!nombre.trim()) {
-        errors.nombre.error = true;
-        showError("nombre", 'nombre-text-error');
-    }
 
-    if (!apellido.trim()) {
-        errors.apellido.error = true;
-        showError("apellido", 'apellido-text-error');
-    }
-
-    // Validar formato del email
-    if (!email.trim() || !emailPattern.test(email)) {
-        errors.email.error = true;
-        showError("email", 'email-text-error');
-    }
 
     // Validar contraseña (ejemplo: al menos 6 caracteres)
-  //  if (!contrasenia.trim() || contrasenia.length < 6) {
-   //     errors.contrasenia.error = true;
-  //      showError("contrasenia", 'contrasenia-text-error');
-   // }
+    if (!contrasenia.trim() || contrasenia.length < 6) {
+        errors.contrasenia.error = true;
+        showError("contrasenia", 'contrasenia-text-error');
+    }
 
     return errors;
 }
+
