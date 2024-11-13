@@ -138,6 +138,10 @@ class AuthViewSet(viewsets.ViewSet):
         'lastname':request.COOKIES.get('lastname'),
         'email':request.COOKIES.get('email'), 
     })
+
+    def modificarContrasenia(self,request):
+        # Renderizar la página con los datos del usuario
+        return render(request, "modificarContrasenia.html")
     
     def auth(self, request):
         email = request.data.get('email')
