@@ -1,0 +1,129 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block javascript %}
+<script src="{% static 'src/js/services/UsuarioService.js' %}"></script>
+<script src="{% static 'src/js/perfil.js' %}"></script>
+<!-- <script src="{% static 'src/js/modificarContrasenia.js' %}"></script> -->
+{% endblock javascript %}
+
+{% block content %}
+<div class="flex w-1/8 pt-4">
+    <!-- Menú Lateral -->
+    <aside class="w-1/4 bg-white shadow-md p-4">
+        <h2 class="text-xl font-bold text-gray-700 mb-4">Mi cuenta</h2>
+        <nav>
+            <ul>
+                <li>
+                    <button id="personal-data-btn"
+                        class="w-full text-left px-4 py-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Datos Personales
+                    </button>
+                </li>
+                <li>
+                    <button id="change-password-btn"
+                        class="w-full text-left px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        Cambiar Contraseña
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Contenido -->
+    <div class="flex-1 bg-white p-6 shadow-md">
+        <!-- Pantalla de Datos Personales -->
+        <section id="personal-data" class="hidden">
+            <h1 class="text-2xl font-bold text-gray-700 mb-4">Modificar datos Personales</h1>
+            <form class="space-y-4" id="formulario-de-datos">
+                <div class="flex gap-4 w-full justify-between items-start">
+                    <div class="w-1/2">
+                        <label for="nombre" class="block text-sm font-medium leading-6 text-gray-900">Nombre</label>
+                        <div>
+                            <input id="nombre" name="nombre" type="text" value="{{ username }}" required
+                                class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+                    <div class="w-1/2">
+                        <label for="apellido" class="block text-sm font-medium leading-6 text-gray-900">Apellido</label>
+                        <div>
+                            <input id="apellido" name="apellido" type="text" value="{{ lastname }}" required
+                                class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
+                    <div>
+                        <input id="email" name="email" type="email" value="{{ email }}" required disabled readonly
+                            class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 disabled:bg-gray-200">
+                    </div>
+                </div>
+                <button type="submit" id="formulario-de-datos-submit"
+                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Guardar</button>
+            </form>
+        </section>
+
+        <!-- Pantalla de Cambiar Contraseña -->
+        <section id="change-password" class="hidden">
+            <h1 class="text-2xl font-bold text-gray-700 mb-4">Cambiar Contraseña</h1>
+            <form class="space-y-4" id="formulario-de-contrasenia">
+                <div>
+                    <label for="contrasenia" class="block text-sm font-medium leading-6 text-gray-900">Contraseña
+                        actual</label>
+                    <div>
+                        <input id="contrasenia-actual" name="contrasenia" type="password" autocomplete="password"
+                            required
+                            class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        <span id="contrasenia-text-error" class="text-sm text-red-500 hidden">La contraseña debe tener
+                            al menos 6 caracteres.</span>
+                    </div>
+                </div>
+                <div>
+                    <label for="contrasenia" class="block text-sm font-medium leading-6 text-gray-900">Nueva
+                        contraseña</label>
+                    <div>
+                        <input id="contrasenia-nueva" name="contrasenia" type="password" autocomplete="password"
+                            required
+                            class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        <span id="contrasenia-text-error" class="text-sm text-red-500 hidden">La contraseña debe tener
+                            al menos 6 caracteres.</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="formulario-de-contrasenia-submit"
+                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Guardar</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+<script>
+    // Referencias a los botones y secciones
+
+    const personalDataBtn = document.getElementById('personal-data-btn');
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const personalDataSection = document.getElementById('personal-data');
+    const changePasswordSection = document.getElementById('change-password');
+
+    // Mostrar/Ocultar secciones
+    personalDataBtn.addEventListener('click', () => {
+        personalDataSection.classList.remove('hidden');
+        changePasswordSection.classList.add('hidden');
+        personalDataBtn.classList.add('bg-blue-500', 'text-white');
+        changePasswordBtn.classList.remove('bg-blue-500', 'text-white');
+        changePasswordBtn.classList.add('bg-gray-200', 'text-gray-700');
+    });
+
+    changePasswordBtn.addEventListener('click', () => {
+        changePasswordSection.classList.remove('hidden');
+        personalDataSection.classList.add('hidden');
+        changePasswordBtn.classList.add('bg-blue-500', 'text-white');
+        personalDataBtn.classList.remove('bg-blue-500', 'text-white');
+        personalDataBtn.classList.add('bg-gray-200', 'text-gray-700');
+    });
+
+    // Mostrar la primera sección por defecto
+    personalDataBtn.click();
+</script>
+{% endblock content %}

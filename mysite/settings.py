@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'django_extensions',
     'compressor',
     'usuarios',
     'conversaciones',
@@ -64,8 +66,8 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'myapp.exceptions.custom_exception_handler',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-    ]
+        'rest_framework.authentication.SessionAuthentication',  # Autenticación de sesión
+    ],
 }
 
 
