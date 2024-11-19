@@ -1,6 +1,7 @@
 class HttpClient {
     constructor(baseURL) {
         this.baseURL = baseURL;
+        this.csrfToken = getCookie('csrftoken');
     }
 
     // Método genérico para manejar las peticiones HTTP
@@ -8,6 +9,7 @@ class HttpClient {
         const config = {
             method,
             headers: {
+                'X-CSRFToken': this.csrfToken,
                 'Content-Type': 'application/json',
                 ...headers,
             },
@@ -44,6 +46,10 @@ class HttpClient {
     // Petición PUT
     put(endpoint, data, headers = {}) {
         return this.request(endpoint, 'PUT', data, headers);
+    }
+
+    patch(endpoint, data, headers = {}) {
+        return this.request(endpoint, 'PATCH', data, headers);
     }
 
     // Petición DELETE

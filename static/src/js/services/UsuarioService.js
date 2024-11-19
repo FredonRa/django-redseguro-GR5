@@ -16,8 +16,13 @@ class _UsuarioService {
     }
 
     // Actualizar un usuario existente
-    async updateUsuario(usuarioId, data) {
-        return await this.client.put(`${usuarioId}/`, data);
+    async updateUsuario(data) {
+        return await this.client.patch(`actualizar/`, data);
+    }
+
+    // Actualizar un contraseña
+    async updatePassword(data) {
+        return await this.client.patch('cambiar-contrasenia/', data);
     }
 
     // Eliminar un usuario

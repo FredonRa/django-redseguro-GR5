@@ -1,7 +1,4 @@
-const UsuarioService = new _UsuarioService();
-
 window.addEventListener('DOMContentLoaded', async function () {
-    const formularioDeRegistro = document.getElementById('formulario-de-registro')
 
     formularioDeRegistro.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -10,26 +7,26 @@ window.addEventListener('DOMContentLoaded', async function () {
         const errors = validateFormData(formData);
         const usuario = getFormData(formData);
 
-        if (!errors.nombre.error &&
-            !errors.apellido.error &&
+        if (
             !errors.email.error &&
-            !errors.contrasenia.error
+            !errors.nueva_contrasenia.error
         ) {
             submit(usuario)
         }
     });
 })
 
-const submit = async (usuario) => {
-    await UsuarioService.createUsuario(usuario)
-        .then(data => {
-            showAlert("success", "Usuario registrado correctamente.")
-            window.location.href = "/ingresar/"
-            return data
-        })
-        .catch(err => {
-            console.error(err)
-        });
+const submit = async () => {
+    const nueva_contrasenia = document.getElementById('nueva_contrasenia').value;  // Obtener la nueva contraseña desde el input
+
+    try {
+        const data = await UsuarioService.updatePassword(nueva_contrasenia);
+        showAlert("success", "Contraseña actualizada correctamente.");
+        window.location.href = "/ingresar/";  // Redirigir al login o a donde corresponda
+    } catch (err) {
+        console.error(err);
+        showAlert("error", "Hubo un error al actualizar la contraseña.");
+    }
 }
 
 function showError(input, errorInputId) {
@@ -51,30 +48,22 @@ function resetErrors() {
 }
 
 const getFormData = (formData) => {
-    const nombre = formData.get('nombre');
-    const apellido = formData.get('apellido');
     const email = formData.get('email');
-    const contrasenia = formData.get('contrasenia');
-    return { nombre, apellido, email, contrasenia }
+    const nueva_contrasenia = formData.get('nueva_contrasenia');
+    return { email, nueva_contrasenia }
 }
 
 const validateFormData = (formData) => {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
     // Obtener los valores de los campos
-    const { nombre, apellido, email, contrasenia } = getFormData(formData);
+    const { email, nueva_contrasenia } = getFormData(formData);
 
     const errors = {
-        nombre: {
-            error: false,
-        },
-        apellido: {
-            error: false,
-        },
         email: {
             error: false,
         },
-        contrasenia: {
+        nueva_contrasenia: {
             error: false,
         },
     };
@@ -82,22 +71,7 @@ const validateFormData = (formData) => {
     resetErrors();
 
 
-    // Validar que los campos no estén vacíos
-    if (!nombre.trim()) {
-        errors.nombre.error = true;
-        showError("nombre", 'nombre-text-error');
-    }
 
-    if (!apellido.trim()) {
-        errors.apellido.error = true;
-        showError("apellido", 'apellido-text-error');
-    }
-
-    // Validar formato del email
-    if (!email.trim() || !emailPattern.test(email)) {
-        errors.email.error = true;
-        showError("email", 'email-text-error');
-    }
 
     // Validar contraseña (ejemplo: al menos 6 caracteres)
     if (!contrasenia.trim() || contrasenia.length < 6) {
@@ -107,3 +81,4 @@ const validateFormData = (formData) => {
 
     return errors;
 }
+

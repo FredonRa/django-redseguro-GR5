@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
                 // Botón para la pregunta (título)
                 const button = document.createElement('button');
-                button.className = 'w-full flex gap-2 items-center py-4 text-left text-gray-700 font-medium';
+                button.className = 'w-full flex gap-2 items-center py-4 text-left text-gray-700 font-medium px-4';
                 button.onclick = () => toggleContent(button);
 
                 // Título de la pregunta

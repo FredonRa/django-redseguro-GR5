@@ -33,11 +33,28 @@ function signup() {
 }
 
 function logout() {
+    //borrando cookies
     deleteCookie('session_id');
     deleteCookie('email');
     deleteCookie('username');
+    // Redirigir a la página de ingresar
     window.location.href = "/ingresar/"
 }
+
+function actualizarDatos() {
+
+    // Redirigir a la página de actualización de datos
+    window.location.href = "/actualizarDatos/";
+}
+
+
+function modificarContrasenia() {
+
+    // Redirigir a la página de modificacion de contraseña
+    window.location.href = "/modificarContrasenia/";
+}
+
+
 
 function toggleDropdown() {
     // Obtener el elemento por su ID
