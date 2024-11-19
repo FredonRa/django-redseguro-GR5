@@ -16,22 +16,13 @@ class _UsuarioService {
     }
 
     // Actualizar un usuario existente
-    async updateUsuario(usuarioId, data) {
-        return await this.client.put(`${usuarioId}/`, data);
+    async updateUsuario(data) {
+        return await this.client.patch(`actualizar/`, data);
     }
 
     // Actualizar un contraseña
-    async updatePassword(nueva_contrasenia) {
-        try {
-            const response = await this.client.post('update-password/', {
-                nueva_contrasenia: nueva_contrasenia
-            });
-            console.log('Contraseña actualizada correctamente:', response.data);
-            return response.data;
-        } catch (error) {
-            console.error('Error al actualizar la contraseña:', error);
-            throw error;  // Lanza el error para ser capturado donde se llame a esta función
-        }
+    async updatePassword(data) {
+        return await this.client.patch('cambiar-contrasenia/', data);
     }
 
     // Eliminar un usuario

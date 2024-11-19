@@ -1,7 +1,4 @@
-const UsuarioService = new _UsuarioService();
-
 window.addEventListener('DOMContentLoaded', async function () {
-    const formularioDeRegistro = document.getElementById('formulario-de-registro')
 
     formularioDeRegistro.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -53,14 +50,14 @@ function resetErrors() {
 const getFormData = (formData) => {
     const email = formData.get('email');
     const nueva_contrasenia = formData.get('nueva_contrasenia');
-    return {email, nueva_contrasenia }
+    return { email, nueva_contrasenia }
 }
 
 const validateFormData = (formData) => {
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
     // Obtener los valores de los campos
-    const {email, nueva_contrasenia } = getFormData(formData);
+    const { email, nueva_contrasenia } = getFormData(formData);
 
     const errors = {
         email: {
