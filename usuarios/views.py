@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import viewsets, mixins
+from django.contrib.auth import update_session_auth_hash
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -84,7 +85,7 @@ class UsuarioViewSet(viewsets.ViewSet):
             respuesta.set_cookie('lastname', user.last_name, max_age=3600)
             return respuesta
         except Exception as e:
-            return Response({"error": "No se pudieron actualizar los datos.", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "No se pudieron actualizar los datos.", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def patch_password(self, request):
         """
@@ -97,23 +98,24 @@ class UsuarioViewSet(viewsets.ViewSet):
         contrasenia_nueva = data.get('contraseniaNueva')
         
         if not contrasenia_actual or not contrasenia_nueva:
-            return Response({"error": "Ambas contraseñas son requeridas."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Ambas contraseñas son requeridas."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Verificar si la contraseña actual es correcta
         if not user.check_password(contrasenia_actual):
-            return Response({"error": "La contraseña actual es incorrecta."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "La contraseña actual es incorrecta."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Validar que la nueva contraseña sea diferente de la actual
         if contrasenia_actual == contrasenia_nueva:
-            return Response({"error": "La nueva contraseña no puede ser igual a la actual."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "La nueva contraseña no puede ser igual a la actual."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Validar longitud mínima de la nueva contraseña
         if len(contrasenia_nueva) < 7:
-            return Response({"error": "La nueva contraseña debe tener al menos 7 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "La nueva contraseña debe tener al menos 7 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Actualizar la contraseña
         user.set_password(contrasenia_nueva)
         user.save()
+        update_session_auth_hash(request, user)
         return Response({"message": "Contraseña actualizada correctamente."}, status=status.HTTP_200_OK)
 
 # class ActualizarUsuarioViewSet(APIView):
