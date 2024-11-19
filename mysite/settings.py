@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-rz7o!fh)*-u)+a#-16*@q)75n1a@r6$(e(b@%it5&%uym9bjf+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['django-redseguro-gr5-1.onrender.com', 'django-redseguro-gr5.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['.vercel.app', 'django-redseguro-gr5-1.onrender.com', 'django-redseguro-gr5.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition

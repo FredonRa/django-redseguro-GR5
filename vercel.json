@@ -7,5 +7,9 @@
         "installCommand": "apt-get update && apt-get install -y libpq-dev && pip install -r requirements.txt"
       }
     }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "manage.py" },
+    { "src": "/static/(.*)", "dest": "/static/$1" }
   ]
 }
