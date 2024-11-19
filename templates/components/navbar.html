@@ -1,3 +1,10 @@
+{% load static %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navbar</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'src/css/output_navbar.css' %}">
+</head>
 <nav class="bg-slate-800 top-0">
   <div class="container max-w-screen-xl mx-auto px-4">
     <div class="relative flex h-16 items-center justify-between">
@@ -30,10 +37,7 @@
       </div>
       <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
         <div class="flex flex-shrink-0 items-center">
-          <img class="h-8 w-auto border border-gray-900 rounded"
-            src="https://raw.githubusercontent.com/FredonRa/django-redseguro-GR5/dev-sprint/static/src/img/RedSeguro.png"
-            alt="RedSeguro">
-          <h2 class="text-md font-semibold text-white border border-black px-2">Red Seguro</h2>
+          <img class="h-9 w-auto border border-gray-900 rounded" src="{% static 'src/icons/RedSeguro_V2.png' %}" alt="RedSeguro">
         </div>
         <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
@@ -42,12 +46,6 @@
               aria-current="page">Inicio</a>
             <a href="/preguntas-frecuentes/" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
               aria-current="page">Preguntas Frecuentes</a>
-            <!-- <a href="#"
-              class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</a>
-            <a href="#"
-              class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
-            <a href="#"
-              class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a> -->
           </div>
         </div>
       </div>
@@ -84,26 +82,12 @@
               id="user-menu-item-0">Your Profile</a>-->
             <a href="cuenta" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
               id="user-menu-item-1">Mi cuenta</a>
+
             <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
               id="user-menu-item-3" onclick="logout()">Cerrar Sesión</a>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Mobile menu, show/hide based on menu state. -->
-  <div class="sm:hidden" id="mobile-menu">
-    <div class="space-y-1 px-2 pb-3 pt-2">
-      <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-      <a href="#" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white"
-        aria-current="page">Dashboard</a>
-      <a href="#"
-        class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</a>
-      <a href="#"
-        class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
-      <a href="#"
-        class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
     </div>
   </div>
 </nav>
