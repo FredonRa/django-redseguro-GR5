@@ -55,3 +55,4 @@ package-lock.json
 
 #Cache de tailwind
 *CACHE
+.vercel
