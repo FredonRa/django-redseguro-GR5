@@ -32,11 +32,11 @@ class BotUI {
             this.setupEventListeners();
 
             if (this.isLoggedIn()) {
-                await this.loadBotData();
-                await this.loadPreviousConversations();
-                this.startConversation();
                 this.containerMensajes.classList.remove("hidden")
                 this.notLoggedIn.classList.add("hidden")
+                await this.loadBotData();
+                this.startConversation();
+                await this.loadPreviousConversations();
             }
         } catch (error) {
             console.error("Error during initialization:", error);
@@ -59,6 +59,7 @@ class BotUI {
 
     setupEventListeners() {
         document.getElementById('chatButton').addEventListener('click', () => this.toggleChat(true));
+        document.getElementById('close-chat').addEventListener('click', () => this.toggleChat(false));
         this.backdrop.addEventListener('click', () => this.toggleChat(false));
         this.verConversacionesAnterioresBtn.addEventListener('click', () => this.showPreviousConversations());
     }
@@ -315,7 +316,7 @@ class BotUI {
 
     createMessage(container, text, isUser) {
         const containerMessage = this.createElement('div', `flex ${isUser ? 'justify-end' : ''}`);
-        const message = this.createElement('div', `p-2 flex rounded-lg w-fit ${isUser ? 'self-end bg-indigo-500 text-white' : 'bg-gray-200'}`, text);
+        const message = this.createElement('div', `p-2 flex rounded-lg w-fit max-w-full ${isUser ? 'self-end bg-indigo-500 text-white' : 'bg-gray-200'}`, text);
         containerMessage.appendChild(message);
         container.appendChild(containerMessage);
     }
